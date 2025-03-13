@@ -18,7 +18,7 @@ class ApplicationProducts extends Model
         'features'=>'array',
     ];
 
-    public function category(): BelongsTo
+    public function category()
     {
         return $this->belongsTo(ApplicationCategory::class,'category_id');
     }
