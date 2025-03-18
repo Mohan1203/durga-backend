@@ -22,9 +22,20 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post("/",[Application_categories_controller::class,"add_application_categories"]);
 
     // Route::get("product",[ProductController::class,"index"])->name('product.index');
-    // Route::resource('/product', ProductController::class);
-    Route::get('/add-application-products',[Application_products_contoller::class,'add_products'])->name('handle.add-application-products');
-    Route::get('product-list',[Application_products_contoller::class,'show'])->name('product-list');
+    Route::get('/products', [ProductController::class, 'index'])->name('product.index');
+    Route::post('/products', [ProductController::class, 'store'])->name('product.store');
+    Route::get('product-list',[ProductController::class,'show'])->name('product.show');
+    Route::get('edit-product/{id}',[ProductController::class,'edit'])->name('product.edit');
+    Route::post('/update-product/{id}',[ProductController::class,'update'])->name('product.update');
+    Route::delete('/delete-product/{id}',[ProductController::class,'destroy'])->name('product.destroy');
+
+
+    // Route::get('/add-application-products',[ProductController::class,'index'])->name('handle.add-application-products');
+    
+  
+    Route::get('edit-application-products/{id}',[ProductController::class,'edit_products'])->name('handle.edit-application-products');
+    Route::post('/add-application-products',[ProductController::class,'handle_add_product'])->name('handle.add-application-products');    
+   
     // Route::get('/edit-application-products/{id}',[Application_products_contoller::class,'edit_products'])->name('handle.edit-application-products');
     // Route::post('/add-application-products',[Application_products_contoller::class,'handle_add_product'])->name('handle.add-application-products');
     // Route::post("/edit-application-product/{id}",[Application_products_contoller::class,'handle_edit_product'])->name('handle.edit-application-products');

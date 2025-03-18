@@ -8,7 +8,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/add-application-products">
+            <a class="nav-link" href="{{ route('product.index') }}">
                 <div>
                     <span class="menu-title">Application Products</span>
                 </div>
