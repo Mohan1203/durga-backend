@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\ApplicationCategory;
 use App\Models\ApplicationProducts;
 
-class ProductController extends Controller
+class ProductPortfolioController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,7 +15,7 @@ class ProductController extends Controller
     {
         $Categories = ApplicationCategory::get();
       
-        return view('admin.product.index',compact('Categories'));
+        return view('admin.product-portfolio.index',compact('Categories'));
     }
 
     /**
@@ -23,7 +23,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-      
+        //
     }
 
     /**
@@ -56,7 +56,7 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request)  
+    public function show(string $id)
     {
         $offset = request('offset', 0);
         $limit = request('limit', 10);
@@ -86,8 +86,8 @@ class ProductController extends Controller
         $no = 1;
         $operate = "";
         foreach ($res as $row) {
-            $operate = '<a href='.route('product.edit',$row->id).' class="btn btn-xs btn-gradient-primary btn-rounded btn-icon edit-data" data-id=' . $row->id . ' title="Edit"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;';
-            $operate .= '<a href='.route('product.destroy',$row->id).' class="btn btn-xs btn-gradient-danger btn-rounded btn-icon delete-form" data-id=' . $row->id . '><i class="fa fa-trash"></i></a>';
+            $operate = '<a href='.route('product-portfolio.edit',$row->id).' class="btn btn-xs btn-gradient-primary btn-rounded btn-icon edit-data" data-id=' . $row->id . ' title="Edit"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;';
+            $operate .= '<a href='.route('product-portfolio.destroy',$row->id).' class="btn btn-xs btn-gradient-danger btn-rounded btn-icon delete-form" data-id=' . $row->id . '><i class="fa fa-trash"></i></a>';
             
             $tempRow = $row->toArray();
             $tempRow['no'] = $no++;
@@ -102,6 +102,7 @@ class ProductController extends Controller
 
         $bulkData['rows'] = $rows;
         return response()->json($bulkData);
+    
     }
 
     /**
@@ -111,7 +112,7 @@ class ProductController extends Controller
     {
         $product = ApplicationProducts::findOrFail($id);
         $categories = ApplicationCategory::select('name','slug','id')->get();
-        return view('admin.product.edit',compact('categories','product'));
+        return view('admin.product-portfolio.edit',compact('categories','product'));
     }
 
     /**

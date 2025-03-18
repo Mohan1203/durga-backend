@@ -8,8 +8,10 @@ use App\Http\Controllers\Application_categories_controller;
 use App\Http\Controllers\Product_portfolios_categories_contoller;
 use App\Http\Controllers\Group_of_companies_contoller;
 use App\Http\Controllers\Events_and_news_contoller;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ApplicationProductController;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\ProductPortfolioController;
+use Illuminate\Support\Facades\App;
 
 Route::get('/login', [auth_controller::class, 'show_login'])->name('login');
 Route::post('/login', [auth_controller::class, 'handle_login'])->name('handle.login');
@@ -21,27 +23,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get("/",[Application_categories_controller::class,"show_application_categories"])->name('handle.application-categories');
     Route::post("/",[Application_categories_controller::class,"add_application_categories"]);
 
-    // Route::get("product",[ProductController::class,"index"])->name('product.index');
-    Route::get('/products', [ProductController::class, 'index'])->name('product.index');
-    Route::post('/products', [ProductController::class, 'store'])->name('product.store');
-    Route::get('product-list',[ProductController::class,'show'])->name('product.show');
-    Route::get('edit-product/{id}',[ProductController::class,'edit'])->name('product.edit');
-    Route::post('/update-product/{id}',[ProductController::class,'update'])->name('product.update');
-    Route::delete('/delete-product/{id}',[ProductController::class,'destroy'])->name('product.destroy');
 
-
-    // Route::get('/add-application-products',[ProductController::class,'index'])->name('handle.add-application-products');
+    Route::resource('application-products', ApplicationProductController::class);
+    Route::resource('product-portfolio', ProductPortfolioController::class);
     
-  
-    Route::get('edit-application-products/{id}',[ProductController::class,'edit_products'])->name('handle.edit-application-products');
-    Route::post('/add-application-products',[ProductController::class,'handle_add_product'])->name('handle.add-application-products');    
-   
-    // Route::get('/edit-application-products/{id}',[Application_products_contoller::class,'edit_products'])->name('handle.edit-application-products');
-    // Route::post('/add-application-products',[Application_products_contoller::class,'handle_add_product'])->name('handle.add-application-products');
-    // Route::post("/edit-application-product/{id}",[Application_products_contoller::class,'handle_edit_product'])->name('handle.edit-application-products');
-    // Route::post('/edit-application-product/{id}',[Application_products_contoller::class,'handle_delete_product'])->name('handle.delete-application-products');
-
-   
 
     Route::get("/product-portfolios-categories",[Product_portfolios_categories_contoller::class,"show_product_portfolios_categories"]);
 

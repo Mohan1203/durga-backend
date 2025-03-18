@@ -5,16 +5,31 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ApplicationCategory;
 use App\Models\ApplicationProducts;
-use Illuminate\Support\Facades\App;
 
-class TestController
+class ApplicationProductController extends Controller
 {
-    public function index(){
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
         $Categories = ApplicationCategory::get();
-      
-        return view('admin.product.index',compact('Categories'));
+        return view('admin.application-product.index',compact('Categories'));
     }
-    public function handle_add_product(Request $request){
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+      
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
         $request->validate([
             'name'=>'required',
             'slug'=>'required',
@@ -22,7 +37,7 @@ class TestController
             'category_id'=>'required',    
         ]);
         
-        // try{
+       
             $features = json_decode($request->features);
             $imageName = time().'.'.$request->image->extension();
             $request->image->move(public_path("product"),$imageName);
@@ -35,43 +50,11 @@ class TestController
             $product->features = $features;
             $product->save();
             return back()->with('success', 'Product added successfully');
-        // }catch(queryException $e){
-            
-        // };
     }
 
-    public function edit_products($id){
-        $product = ApplicationProducts::findOrFail($id);
-        $all_categories = ApplicationCategory::select('name','slug','id')->get()->toArray();
-        return view('admin.edit-application-product',compact('all_categories','product'));
-    }
-
-    public function handle_edit_product(Request $request,$id){
-        $product = ApplicationProducts::findOrFail($id);
-        $request->validate([
-            'name'=>'required',
-            'slug'=>'required',
-            'category_id'=>'required',     
-        ]);
-        $product->name = $request->name;
-        $product->slug = $request->slug;
-        $product->category_id = $request->category_id;
-        $product->description = $request->description ?? $product->description;
-        $product->features = json_decode($request->features) ?? $product->features; 
-        if($request->image != null){
-            $imageName = time().'.'.$request->image->extension();
-            $request->image->move(public_path("product"),$imageName);
-            $product->image = 'product/' . $imageName;
-        }
-        $product->save();
-        return back()->with("success","Product edit successfully");
-    }
-
-    public function handle_delete_product(Request $request,$id){
-        $res = ApplicationProducts::where('id',$id)->delete();
-        return back()->with('success', 'Product deleted successfully');
-    }
-
+    /**
+     * Display the specified resource.
+     */
     public function show(Request $request)  
     {
         $offset = request('offset', 0);
@@ -102,8 +85,8 @@ class TestController
         $no = 1;
         $operate = "";
         foreach ($res as $row) {
-            // $operate = '<a href='.route('edit-application-products',$row->id).' class="btn btn-xs btn-gradient-primary btn-rounded btn-icon edit-data" data-id=' . $row->id . ' title="Edit" data-toggle="modal" data-target="#editModal"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;';
-            // $operate .= '<a href='.route('',$row->id).' class="btn btn-xs btn-gradient-danger btn-rounded btn-icon delete-form" data-id=' . $row->id . '><i class="fa fa-trash"></i></a>';
+            $operate = '<a href='.route('application-products.edit',$row->id).' class="btn btn-xs btn-gradient-primary btn-rounded btn-icon edit-data" data-id=' . $row->id . ' title="Edit"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;';
+            $operate .= '<a href='.route('application-products.destroy',$row->id).' class="btn btn-xs btn-gradient-danger btn-rounded btn-icon delete-form" data-id=' . $row->id . '><i class="fa fa-trash"></i></a>';
             
             $tempRow = $row->toArray();
             $tempRow['no'] = $no++;
@@ -118,5 +101,49 @@ class TestController
 
         $bulkData['rows'] = $rows;
         return response()->json($bulkData);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $product = ApplicationProducts::findOrFail($id);
+        $categories = ApplicationCategory::select('name','slug','id')->get();
+        return view('admin.product.edit',compact('categories','product'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $product = ApplicationProducts::findOrFail($id);
+        $request->validate([
+            'name'=>'required',
+            'slug'=>'required',
+            'category_id'=>'required',     
+        ]);
+        $product->name = $request->name;
+        $product->slug = $request->slug;
+        $product->category_id = $request->category_id;
+        $product->description = $request->description ?? $product->description;
+        $product->features = json_decode($request->features) ?? $product->features; 
+        if($request->image != null){
+            $imageName = time().'.'.$request->image->extension();
+            $request->image->move(public_path("product"),$imageName);
+            $product->image = 'product/' . $imageName;
+        }
+        $product->save();
+        return back()->with("success","Product edit successfully");
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $res = ApplicationProducts::where('id',$id)->delete();
+        return back()->with('success', 'Product deleted successfully');
     }
 }

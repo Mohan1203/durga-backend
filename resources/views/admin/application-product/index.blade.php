@@ -3,7 +3,7 @@
     <div class="content-wrapper">
         <div class="page-header">
             <h3 class="page-title">
-               Manage Products
+               Manage Application Products
             </h3>
         </div>
         <div class="row">
@@ -11,9 +11,9 @@
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">
-                            Create Products
+                            Create Application Products
                         </h4>
-                        <form class="pt-3 class-create-form" id="create-form" action="{{ route('product.store') }}"
+                        <form class="pt-3 class-create-form" id="create-form" action="{{ route('application-products.store') }}"
                             method="POST" novalidate="novalidate">
                             <div class="row">
                                 <div class="form-group col-sm-12 col-md-6">
@@ -38,7 +38,7 @@
                                     <input type="file" name="file[]" class="form-control" multiple />
                                 </div>
                             </div>
-                            <h4>Features Sections</h4>
+                            <h4>Features and Benefits</h4>
                             <hr>
                             <div class="row feature-row">
                                 <div class="form-group col-sm-12 col-md-5">
@@ -67,11 +67,11 @@
                 <div class="card">
                     <div class="card-body">
                     <h4 class="card-title">
-                        List Products
+                        List Application Products
                     </h4>
                    
                     <table aria-describedby="mydesc" class='table' id='table_list' data-toggle="table"
-                        data-url="{{ route('product.show', 1) }}" data-click-to-select="true" data-side-pagination="server"
+                        data-url="{{ route('application-products.show', 1) }}" data-click-to-select="true" data-side-pagination="server"
                         data-pagination="true" data-page-list="[5, 10, 20, 50, 100, 200]" data-search="true"
                         data-show-columns="true" data-show-refresh="true" data-trim-on-search="false"
                         data-mobile-responsive="true" data-sort-name="id" data-toolbar="#toolbar" data-sort-order="desc"
