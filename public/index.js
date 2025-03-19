@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 });
-
 function handleSlug() {
     const nameInput = document.querySelector('input[name="name"]');
     const slugInput = document.querySelector('input[name="slug"]');
@@ -55,7 +54,7 @@ function handleAddFeature(initialFeatures = []) {
     const addFeatureBtn = document.getElementById("feature-add-btn");
     const featuresContainer = document.getElementById("features-container");
     const featuresArrayInput = document.getElementById("featuresArray");
-
+    console.log("feature container", featuresContainer)
     // Function to update the UI and hidden input
     function updateFeatureList() {
         featuresContainer.innerHTML = "";
@@ -90,7 +89,6 @@ function handleAddFeature(initialFeatures = []) {
     // Initialize the feature list on page load
     updateFeatureList();
 }
-
 function handleImageUpload() {
     const imageInput = document.getElementById("imageInput");
     const previewImage = document.getElementById("previewImage");
@@ -99,7 +97,6 @@ function handleImageUpload() {
 
     // Handle image preview on file select
     imageInput.addEventListener("change", function (event) {
-        console.log("preview image", previewImage.src)
         const file = event.target.files[0];
 
         if (file) {
@@ -109,7 +106,7 @@ function handleImageUpload() {
                     // Create new image if not present
                     const newImg = document.createElement("img");
                     newImg.id = "previewImage";
-                    newImg.className = "h-25 w-25 img-thumbnail";
+                    newImg.className = "h-100 w-100 img-thumbnail";
                     imageContainer.appendChild(newImg);
                 }
                 previewImage.src = e.target.result;

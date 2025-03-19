@@ -7,7 +7,7 @@ use App\Http\Controllers\Application_products_contoller;
 use App\Http\Controllers\Application_categories_controller;
 use App\Http\Controllers\Product_portfolios_categories_contoller;
 use App\Http\Controllers\Group_of_companies_contoller;
-use App\Http\Controllers\Events_and_news_contoller;
+use App\Http\Controllers\EventsAndNewsController;
 use App\Http\Controllers\ApplicationProductController;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ProductPortfolioController;
@@ -22,19 +22,27 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get("/",[Application_categories_controller::class,"show_application_categories"])->name('handle.application-categories');
     Route::post("/",[Application_categories_controller::class,"add_application_categories"]);
+    Route::get("/edit_category/{id}",[Application_categories_controller::class,"show_edit_application_categories"]);
+    Route::post("/edit_category/{id}",[Application_categories_controller::class,"edit_application_category"])->name('handle.edit-categories');
+    Route::post("/delele_category/{id}",[Application_categories_controller::class,"delete_application_category"])->name('handle.delete-categories');
+    
 
 
     Route::resource('application-products', ApplicationProductController::class);
+    
     Route::resource('product-portfolio', ProductPortfolioController::class);
     
 
     Route::get("/product-portfolios-categories",[Product_portfolios_categories_contoller::class,"show_product_portfolios_categories"]);
 
     Route::get("/group-of-companies",[Group_of_companies_contoller::class,"show_group_of_companies"]); 
-    Route::get("/add-timeline",[Group_of_companies_contoller::class,'handle_add_year'])->name('handle.add-year');
+    Route::post("/add-timeline",[Group_of_companies_contoller::class,'handle_add_year'])->name('handle.add-year');
+    Route::get("/show-group-of-company",[Group_of_companies_contoller::class,'handle_show_data'])->name("handle.show-grp-comp");
+    Route::get("/show-edit-group-of-company/{id}",[Group_of_companies_contoller::class,'handle_show_edit'])->name("handle.show-edit-grp-comp");
+    Route::post("/edit-group-of-company/{id}",[Group_of_companies_contoller::class,'handle_edit_data'])->name("handle.edit-grp-cmp");
+    Route::delete('/delete-group-of-comp/{id}',[Group_of_companies_contoller::class,'delete_timeline'])->name('handle.delete_timeline');
     
-    Route::get("/events-and-news",[Events_and_news_contoller::class,"show_events_and_news"]);   
-
+    Route::resource("/events-and-news",EventsAndNewsController::class);
 });                                                             
 
 // Application products routes

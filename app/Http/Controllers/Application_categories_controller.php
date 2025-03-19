@@ -9,8 +9,8 @@ use App\Models\ApplicationCategory;
 class Application_categories_controller 
 {
     public function show_application_categories(){
-        $all_categories = ApplicationCategory::select('name', 'image', 'slug')->get()->toArray();
-        return view('admin.application-categories', compact('all_categories'));
+        $all_categories = ApplicationCategory::select('id','name', 'image', 'slug')->get()->toArray();
+        return view('admin.application-category.application-categories', compact('all_categories'));
     }
 
     public function add_application_categories(Request $request){
@@ -37,4 +37,33 @@ class Application_categories_controller
     
       
     }
+
+    public function show_edit_application_categories($id){
+        $category = ApplicationCategory::findOrFail($id);
+        return view('admin.application-category.edit-category', compact('category'));
+    }
+
+    public function edit_application_category(Request $request,$id){
+        $category = ApplicationCategory::findOrFail($id);
+        $request->validate([
+           'name'=>'required',
+           'slug'=>'required',
+        ]);
+
+        $category->name = $request->name;
+        $category->slug = $request->slug;
+        if($request->image != null){
+            $imageName = time().'.'.$request->image->extension();
+            $request->image->move(public_path("images"),$imageName);
+            $category->image = 'images/' . $imageName;
+        }
+        $category->save();
+        return redirect()->to('/');
+    }
+
+    public function delete_application_category(Request $request,  $id){
+        $res = ApplicationCategory::where('id',$id)->delete();
+        return back()->with('success', 'Category deleted successfully');
+    }
+
 }

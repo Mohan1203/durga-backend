@@ -5,34 +5,39 @@
 
 @section('content')
     <h1 class="text-2xl font-bold">Edit Application Products</h1>
-    <form action="{{ route('application-products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('application-products.update', $product->id) }}" method="POST" enctype="multipart/form-data"
+        class="editform" id="edit-form">
         @csrf
-        <div class="row">
+        @method('PUT')
+        {{-- <div class="row">
             <div class="col-md-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">
                             Edit Application Products
                         </h4>
-                        <form class="pt-3 class-create-form" id="create-form" action="{{ route('product.store') }}"
-                            method="POST" novalidate="novalidate">
+                        <form class="pt-3 class-create-form" id="create-form"
+                            action="{{ route('application-products.update', $product->id) }}" method="POST"
+                            novalidate="novalidate">
                             <div class="row">
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Name <span class="text-danger">*</span></label>
-                                    <input name="name" type="text" placeholder="Enter Product Name" class="form-control" />
+                                    <input name="name" type="text" placeholder="Enter Product Name"
+                                        class="form-control" />
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Category ID</label>
                                     <select name="category_id" id="category_id" class="form-control p-3">
-                                        <option value="">{{__('Please')}}  {{__('select')}}</option>
+                                        <option value="">{{ __('Please') }} {{ __('select') }}</option>
                                         @foreach ($categories as $category)
-                                            <option value="{{ $category->id}}">{{ $category->name}}</option>
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Slug<span class="text-danger">*</span></label>
-                                    <input name="slug" type="text" placeholder="Enter Slug Name" class="form-control" />
+                                    <input name="slug" type="text" placeholder="Enter Slug Name"
+                                        class="form-control" />
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>{{ __('files') }} </label>
@@ -44,7 +49,8 @@
                                 <hr>
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Title<span class="text-danger">*</span></label>
-                                    <input name="feature[][name]" type="text" placeholder="Enter Product Name" class="form-control" />
+                                    <input name="feature[][name]" type="text" placeholder="Enter Product Name"
+                                        class="form-control" />
                                 </div>
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Description<span class="text-danger">*</span></label>
@@ -61,8 +67,9 @@
                     </div>
                 </div>
             </div>
-
-            {{-- @php
+        </div> --}}
+        <div class="row">
+            @php
                 $fields = [
                     [
                         'name' => 'name',
@@ -87,9 +94,9 @@
 
                     ['name' => 'feature', 'type' => 'text', 'label' => 'Feature', 'placeholder' => 'Feature'],
                 ];
-            @endphp --}}
+            @endphp
             {{-- {{ dd($product->slug) }} --}}
-            {{-- @foreach ($fields as $field)
+            @foreach ($fields as $field)
                 <div class="col-md-6 mb-3">
                     <label for="{{ $field['name'] }}">{{ $field['label'] }}</label>
                     @if ($field['type'] == 'textarea')
@@ -127,16 +134,15 @@
                         </div>
                     @elseif($field['name'] == 'image')
                         <div class="d-flex flex-column gap-2">
-                           
+
                             <div class="d-flex flex-column gap-2">
                                 <div class="d-flex flex-column">
-                                   
+
                                     <input type="file" name="image" class="form-control" id="imageInput">
                                 </div>
                                 <div id="imageContainer" class="position-relative d-inline-block">
                                     @if ($product->image)
-                                        <img id="previewImage"
-                                            src="{{ asset('http://localhost:8000/' . $product->image) }}"
+                                        <img id="previewImage" src="{{ asset(env('APP_URL') . '/' . $product->image) }}"
                                             class="h-25 w-25 img-thumbnail">
                                     @else
                                         <img id="previewImage" src="" class="h-25 w-25 img-thumbnail d-none">
@@ -153,9 +159,9 @@
                         <span class="text-danger mt-5">{{ $message }}</span>
                     @enderror
                 </div>
-            @endforeach --}}
+            @endforeach
 
         </div>
-        {{-- <button type="submit" class="btn btn-primary">Submit</button> --}}
-    {{-- </form> --}}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 @endsection

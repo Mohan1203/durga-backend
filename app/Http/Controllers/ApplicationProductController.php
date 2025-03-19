@@ -30,26 +30,35 @@ class ApplicationProductController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'name'=>'required',
-            'slug'=>'required',
+            'slug'=>'required | unique:application_products,slug',
             'image'=>'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'category_id'=>'required',    
+        ],[
+            'slug.unique' => 'Slug must be unique'
         ]);
-        
-       
-            $features = json_decode($request->features);
-            $imageName = time().'.'.$request->image->extension();
-            $request->image->move(public_path("product"),$imageName);
-            $product = new ApplicationProducts;
-            $product->name = $request->name;
-            $product->image = 'product/'.$imageName;
-            $product->slug = $request->slug;
-            $product->description = $request->description;
-            $product->category_id = $request->category_id;
-            $product->features = $features;
-            $product->save();
-            return back()->with('success', 'Product added successfully');
+            try{
+                $features = json_decode($request->features);
+                $imageName = time().'.'.$request->image->extension();
+                $request->image->move(public_path("product"),$imageName);
+                $product = new ApplicationProducts;
+                $product->name = $request->name;
+                $product->image = 'product/'.$imageName;
+                $product->slug = $request->slug;
+                $product->description = $request->description;
+                $product->category_id = $request->category_id;
+                $product->features = $features;
+                $product->save();
+                return back()->with('success', 'Product added successfully');    
+            }catch(QueryException $e){
+                if($e->getcode() == 23000){
+                    return back()->with('error','Slug must be unique');
+                    return back()->with('error',"Something went wrong");
+                }
+            }
+           
     }
 
     /**
@@ -110,7 +119,7 @@ class ApplicationProductController extends Controller
     {
         $product = ApplicationProducts::findOrFail($id);
         $categories = ApplicationCategory::select('name','slug','id')->get();
-        return view('admin.product.edit',compact('categories','product'));
+        return view('admin.application-product.edit',compact('categories','product'));
     }
 
     /**

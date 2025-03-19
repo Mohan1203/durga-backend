@@ -69,12 +69,19 @@
                             <td>{{ $category['name'] }}</td>
                             <td>{{ $category['slug'] }}</td>
                             <td>
-                                <img src="{{ asset($category['image']) }}" width="50" height="50"
-                                    alt="Category Image">
+                                <img src="{{ asset(env('APP_URL') . '/' . $category['image']) }}" width="50"
+                                    height="50" alt="Category Image">
                             </td>
                             <td>
-                                <a href="#" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="#" class="btn btn-danger btn-sm">Delete</a>
+                                <a href="/edit_category/{{ $category['id'] }}" class="btn btn-warning btn-sm">Edit</a>
+
+                                {{-- <a href="/delele_category/{{ $category['id'] }}" class="btn btn-danger btn-sm">Delete</a> --}}
+                                <form action="{{ route('handle.delete-categories', $category['id']) }}" method="POST"
+                                    style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Are you sure you want to delete this?')">Delete</button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach
