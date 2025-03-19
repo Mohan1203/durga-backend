@@ -60,17 +60,17 @@ $(function () {
 
         $(this).parent().find('.form-control').val($(this).val().replace(/C:\\fakepath\\/i, ''));
     });
-    tinymce.init({
-        height: "400",
-        selector: '#tinymce_message',
-        menubar: 'file edit view formate tools',
-        toolbar: [
-            'styleselect fontselect fontsizeselect',
-            'undo redo | cut copy paste | bold italic | alignleft aligncenter alignright alignjustify',
-            'bullist numlist | outdent indent | blockquote autolink | lists |  code'
-        ],
-        plugins: 'autolink link image lists code'
-    });
+    // tinymce.init({
+    //     height: "400",
+    //     selector: '#tinymce_message',
+    //     menubar: 'file edit view formate tools',
+    //     toolbar: [
+    //         'styleselect fontselect fontsizeselect',
+    //         'undo redo | cut copy paste | bold italic | alignleft aligncenter alignright alignjustify',
+    //         'bullist numlist | outdent indent | blockquote autolink | lists |  code'
+    //     ],
+    //     plugins: 'autolink link image lists code'
+    // });
 
     $('.modal').on('hidden.bs.modal', function () {
         //Reset input file on modal close
@@ -91,7 +91,7 @@ $(function () {
             format: 'hex',
             keepInput: true, // Keep the input value in HEX format
             hideInput: true, // Hide the original input field
-            onChange: function(color) {
+            onChange: function (color) {
                 $('.color_value').val(color); // Update the HEX color value
             }
         });
