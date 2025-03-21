@@ -16,6 +16,11 @@
                     {{ session('error') }}
                 </div>
             @endif
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
             <div class="row">
                 <form method="POST" enctype="multipart/form-data" action="{{ route('handle.add-year') }}">
                     @csrf
@@ -98,4 +103,73 @@
         </div>
     </div>
     </div>
+@endsection
+
+@section('script')
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        // Function to refresh CSRF token
+        function refreshToken() {
+            $.get('{{ route('refresh-csrf') }}').done(function(data) {
+                $('meta[name="csrf-token"]').attr('content', data);
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': data
+                    }
+                });
+            });
+        }
+
+        $(document).ready(function() {
+            // Handle delete functionality with CSRF token refresh
+            $(document).on('click', '.delete-timeline', function(e) {
+                e.preventDefault();
+                var timelineId = $(this).data('id');
+                var deleteUrl = $(this).data('url');
+
+                if (confirm('Are you sure you want to delete this timeline?')) {
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'DELETE',
+                        data: {
+                            "_token": $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            showSuccessMessage('Timeline deleted successfully');
+                            // Reload the table after successful deletion
+                            $('#table_list').bootstrapTable('refresh');
+                        },
+                        error: function(xhr) {
+                            console.log(xhr);
+                            if (xhr.status === 419) { // CSRF token mismatch
+                                refreshToken();
+                                alert('Your session has expired. Please try again.');
+                            } else {
+                                alert('Error deleting timeline: ' + (xhr.responseJSON
+                                    ?.message || 'Unknown error'));
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Show success/error messages
+            function showSuccessMessage(message) {
+                $('<div class="alert alert-success">' + message + '</div>')
+                    .appendTo('.page-header')
+                    .delay(3000)
+                    .fadeOut(350, function() {
+                        $(this).remove();
+                    });
+            }
+
+            // Auto hide alerts
+            $('.alert-success, .alert-danger').delay(3000).fadeOut(350);
+        });
+    </script>
 @endsection

@@ -20,7 +20,7 @@ class application_categories
             }); 
             return response()->json([
                 'success' => true,
-                'categories' => $allCategories
+                'data' => $allCategories
             ], 200);
         } catch (QueryException $e) {
             // Handle any database-related errors

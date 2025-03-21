@@ -37,7 +37,7 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/setting">
+            <a class="nav-link" href="/settings">
                 <i class="fa-solid fa-gear fa-lg"></i>
                 <span class="menu-title">Setting</span>
             </a>

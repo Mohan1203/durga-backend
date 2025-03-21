@@ -12,6 +12,7 @@ use App\Http\Controllers\ApplicationProductController;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\ProductPortfolioController;
 use Illuminate\Support\Facades\App;
+use App\Http\Controllers\SettingContoller;
 
 Route::get('/login', [auth_controller::class, 'show_login'])->name('login');
 Route::post('/login', [auth_controller::class, 'handle_login'])->name('handle.login');
@@ -43,6 +44,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/delete-group-of-comp/{id}',[Group_of_companies_contoller::class,'delete_timeline'])->name('handle.delete_timeline');
     
     Route::resource("/events-and-news",EventsAndNewsController::class);
+    Route::resource('/settings',SettingContoller::class);
+    
+    Route::get('/refresh-csrf', function() {
+        return csrf_token();
+    })->name('refresh-csrf');
 });                                                             
 
 // Application products routes

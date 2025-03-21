@@ -95,7 +95,9 @@ class ApplicationProductController extends Controller
         $operate = "";
         foreach ($res as $row) {
             $operate = '<a href='.route('application-products.edit',$row->id).' class="btn btn-xs btn-gradient-primary btn-rounded btn-icon edit-data" data-id=' . $row->id . ' title="Edit"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;';
-            $operate .= '<a href='.route('application-products.destroy',$row->id).' class="btn btn-xs btn-gradient-danger btn-rounded btn-icon delete-form" data-id=' . $row->id . '><i class="fa fa-trash"></i></a>';
+            
+            // Use a form with hidden method for DELETE instead of a direct link
+            $operate .= '<button type="button" class="btn btn-xs btn-gradient-danger btn-rounded btn-icon delete-form" data-id="' . $row->id . '" data-url="'.route('application-products.destroy', $row->id).'"><i class="fa fa-trash"></i></button>';
             
             $tempRow = $row->toArray();
             $tempRow['no'] = $no++;
@@ -128,6 +130,7 @@ class ApplicationProductController extends Controller
     public function update(Request $request, string $id)
     {
         $product = ApplicationProducts::findOrFail($id);
+        // dd($request->name);
         $request->validate([
             'name'=>'required',
             'slug'=>'required',
@@ -152,7 +155,27 @@ class ApplicationProductController extends Controller
      */
     public function destroy(string $id)
     {
-        $res = ApplicationProducts::where('id',$id)->delete();
-        return back()->with('success', 'Product deleted successfully');
+        try {
+            $product = ApplicationProducts::findOrFail($id);
+            
+            // Delete product image if exists
+            if ($product->image && file_exists(public_path($product->image))) {
+                unlink(public_path($product->image));
+            }
+            
+            $product->delete();
+            
+            if (request()->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Product deleted successfully']);
+            }
+            
+            return back()->with('success', 'Product deleted successfully');
+        } catch (\Exception $e) {
+            if (request()->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Error deleting product: ' . $e->getMessage()], 500);
+            }
+            
+            return back()->with('error', 'Error deleting product: ' . $e->getMessage());
+        }
     }
 }
