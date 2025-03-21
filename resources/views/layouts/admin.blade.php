@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') Admin Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -23,7 +24,7 @@
     <link rel="stylesheet" href="{{ asset('/assets/bootstrap-table/bootstrap-table.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/bootstrap-table/fixed-columns.min.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/bootstrap-table/reorder-rows.css') }}">
-
+    <link rel="stylesheet" href="{{ asset('/assets/css/jquery.tagsinput.min.css') }}">
 
     {{-- <link rel="shortcut icon" href="{{asset(config('global.LOGO_SM')) }}" /> --}}
     <link rel="shortcut icon" href="{{ url(Storage::url(env('FAVICON'))) }}" />
@@ -66,10 +67,12 @@
     <script src="{{ asset('/assets/color-picker/jquery-asColor.min.js') }}"></script>
     <script src="{{ asset('/assets/color-picker/color.min.js') }}"></script>
     <script src="{{ asset('/assets/js/custom/function.js') }}"></script>
+    <script src="{{ asset('/assets/js/custom/formatter.js') }}"></script>
     <script src="{{ asset('/assets/js/jquery-additional-methods.min.js') }}"></script>
-
+    <script src="{{ asset('/assets/js/jquery.tagsinput.min.js') }}"></script>
     <script src="{{ asset('/assets/js/custom/custom.js') }}"></script>
     <script src="{{ asset('/assets/js/custom/custom-bootstrap-table.js') }}"></script>
+   
 
     @if ($errors->any())
         @foreach ($errors->all() as $error)
@@ -111,7 +114,11 @@
                 if (result.isConfirmed) {
                     $.ajax({
                         url: $(this).attr('data-url'),
-                        type: "DELETE",
+                        type: "POST",
+                        data: {
+                            _method: "DELETE", 
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
                         success: function(response) {
                             if (response['error'] == false) {
                                 showSuccessToast(response['message']);

@@ -22,8 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
 function handleSlug() {
     const nameInput = document.querySelector('input[name="name"]');
     const slugInput = document.querySelector('input[name="slug"]');
-    console.log("name input", nameInput)
-    console.log("slug input", slugInput)
     if (nameInput && slugInput) {
         nameInput.addEventListener("input", function () {
             let slug = nameInput.value

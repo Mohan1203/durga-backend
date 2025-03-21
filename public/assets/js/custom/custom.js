@@ -276,62 +276,298 @@ $(document).on('click', '.delete-form', function (e) {
     })
 })
 
-// $(document).on('click', '.add-feature', function (e) {
-//     let featureIndex = 1;
+$(document).on('click', '.add-feature', function (e) {
+    e.preventDefault();
 
-//      let featureSection = $(this).closest('.row'); // Find the closest row
-//         let clonedSection = featureSection.clone(); // Clone the row
+    let lastRow = $('.feature-row:last');
+    let newRow = lastRow.clone();
 
-//         // Update input names with the new index
-//         clonedSection.find("input, textarea").each(function () {
-//             let name = $(this).attr("name"); // Get the current name
-//             let newName = name.replace(/\d+/, featureIndex); // Replace the index with the new count
-//             $(this).attr("name", newName); // Set the updated name
-//             $(this).val(""); // Clear input values
-//         });
+    newRow.find(':input').each(function () {
+        let name = $(this).attr('name');
 
-//         // Append the cloned section after the last one
-//         featureSection.after(clonedSection);
-
-//         // Increment the index for the next row
-//         featureIndex++;
-// })
-
-$(document).ready(function () {
-    let featureIndex = 0; // Start indexing from 1 since 0 is already in HTML
-
-    // Add a new feature row
-    $(document).on('click', '.add-feature', function (e) {
-        e.preventDefault();
-
-        let featureSection = $(this).closest('.feature-row'); // Find the closest feature row
-        let clonedSection = featureSection.clone(); // Clone the row
-
-        // Update input names with the new index
-        clonedSection.find("input, textarea").each(function () {
-            let name = $(this).attr("name"); // Get the current name
-            let newName = name.replace(/\d+/, featureIndex); // Replace the index with the new count
-            $(this).attr("name", newName); // Set the updated name
-            $(this).val(""); // Clear input values
-        });
-
-        // Change "+" button to "Remove" button in the cloned row
-        clonedSection.find(".add-feature")
-            .removeClass("add-feature btn-primary")
-            .addClass("remove-feature btn-danger")
-            .text("-");
-
-        // Append the cloned section after the last one
-        featureSection.after(clonedSection);
-
-        // Increment the index for the next row
-        featureIndex++;
+        if (name) {
+            $(this).attr('name', name.replace(/\[(\d+)\]/, function (match, index) {
+                return '[' + (parseInt(index, 10) + 1) + ']';
+            }));
+        }
+        $(this).val('');
     });
 
-    // Remove a feature row
-    $(document).on('click', '.remove-feature', function (e) {
-        e.preventDefault();
-        $(this).closest('.feature-row').remove(); // Remove the row
-    });
+    newRow.find('.add-feature')
+    .removeClass('add-feature btn-primary')
+    .addClass('remove-feature btn-danger')
+    .text('-');
+
+    $('.extra-features').append(newRow);
 });
 
+$(document).on('click', '.remove-feature', function (e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    var url = $(this).data('url');
+
+    if(id != null && url != null) {
+        Swal.fire({
+            title: "Delete Title",
+            text: "Confirm Message",
+            icon: 'Warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: "Yes Delete"
+        })          
+        .then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: url,
+                    type: "DELETE",
+                    success: function(response) {
+                        if (response['error'] == false) {
+                            showSuccessToast(response['message']);
+                            $('#table_list').bootstrapTable('refresh');
+                        }
+
+                        if (response['error'] == true) {
+                            showErrorToast(response['message']);
+                        }
+                    }
+                })
+            }
+        });
+
+    }else{
+        $(this).closest('.feature-row').remove();
+    }   
+});
+
+$('#tags').tagsInput({
+    'width': '100%',
+    'height': '75%',
+    'interactive': true,
+    'defaultText': "Add More",
+    'removeWithBackspace': true,
+    'minChars': 0,
+    // 'maxChars': 20, // if not provided there is no limit
+    'placeholderColor': '#666666'
+});
+
+$(document).on('click', '.add-category', function (e) {
+    e.preventDefault();
+
+    let lastRow = $('.category-row:last');
+    let newRow = lastRow.clone();
+
+    newRow.find(':input').each(function () {
+        let name = $(this).attr('name');
+
+        if (name) {
+            $(this).attr('name', name.replace(/\[(\d+)\]/, function (match, index) {
+                return '[' + (parseInt(index, 10) + 1) + ']';
+            }));
+        }
+        $(this).val('');
+    });
+
+    newRow.find('.add-category')
+    .removeClass('add-category btn-primary')
+    .addClass('remove-category btn-danger')
+    .text('-');
+
+    $('.extra-category').append(newRow);
+});
+
+$(document).on('click', '.remove-category', function (e) {
+
+    e.preventDefault();
+    var id = $(this).data('id');
+    var url = $(this).data('url');
+
+    if(id != null && url != null) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        })          
+        .then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: url,
+                    type: "DELETE",
+                    success: function(response) {
+                        if (response['error'] == false) {
+                            showSuccessToast(response['message']);
+                            $('#table_list').bootstrapTable('refresh');
+                        }
+
+                        if (response['error'] == true) {
+                            showErrorToast(response['message']);
+                        }
+                    }
+                })
+            }
+        });
+
+    }else{
+        $(this).closest('.category-row').remove();
+    }
+   
+});
+
+
+$(document).on('click', '.add-key-feature', function (e) {
+    e.preventDefault();
+
+    let lastRow = $('.key-feature-row:last');
+    let newRow = lastRow.clone();
+
+    newRow.find(':input').each(function () {
+        let name = $(this).attr('name');
+
+        if (name) {
+            $(this).attr('name', name.replace(/\[(\d+)\]/, function (match, index) {
+                return '[' + (parseInt(index, 10) + 1) + ']';
+            }));
+        }
+        $(this).val('');
+    });
+
+    newRow.find('.add-key-feature')
+    .removeClass('add-key-feature btn-primary')    
+    .addClass('remove-key-feature btn-danger')
+    .text('-');
+
+    $('.extra-key-feature').append(newRow);
+});
+
+$(document).on('click', '.remove-key-feature', function () {
+    var id = $(this).data('id');
+    var url = $(this).data('url');
+
+    if(id != null && url != null) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: $url,
+                    type: "DELETE",
+                    success: function(response) {
+                        if (response['error'] == false) {
+                            showSuccessToast(response['message']);
+                            $('#table_list').bootstrapTable('refresh');
+                        } else {
+                            showErrorToast(response['message']);
+                        }
+                    }
+                });
+            }
+        })
+    }else{
+        $(this).closest('.key-feature-row').remove();
+    }
+    
+});
+
+$(document).on('click', '.add-industry', function (e) {
+    e.preventDefault();
+
+    let lastRow = $('.industry-row:last');
+    let newRow = lastRow.clone();
+
+    newRow.find(':input').each(function () {
+        let name = $(this).attr('name');
+
+        if (name) {
+            $(this).attr('name', name.replace(/\[(\d+)\]/, function (match, index) {
+                return '[' + (parseInt(index, 10) + 1) + ']';
+            }));
+        }
+        $(this).val('');
+    });
+
+    newRow.find('.add-industry')
+    .removeClass('add-industry btn-primary')    
+    .addClass('remove-industry btn-danger')
+    .text('-');
+
+    $('.extra-industry').append(newRow);
+});
+
+$(document).on('click', '.remove-industry', function () {
+    var id = $(this).data('id');
+    var url = $(this).data('url');
+
+    if(id != null && url != null) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: url,
+                    type: "DELETE",
+                    success: function(response) {
+                        if (response['error'] == false) {
+                            showSuccessToast(response['message']);
+                            $('#table_list').bootstrapTable('refresh');
+                        } else {
+                            showErrorToast(response['message']);
+                        }
+                    }
+                });
+            }
+        })
+    }else{
+        $(this).closest('.industry-row').remove();
+    }
+
+});
+
+$(document).on('click', '.remove-grade', function () {
+    var id = $(this).data('id');
+    var url = $(this).data('url');
+
+    if(id != null && url != null) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: url,
+                    type: "DELETE",
+                    success: function(response) {
+                        if (response['error'] == false) {
+                            showSuccessToast(response['message']);
+                        } else {
+                            showErrorToast(response['message']);
+                        }
+                    }
+                });
+            }
+        })
+    }else{
+        $(this).closest('.industry-row').remove();
+    }
+
+});

@@ -5,6 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ApplicationCategory;
 use App\Models\ApplicationProducts;
+use App\Models\ProductPortfolio;
+use App\Models\FeatureSection;
+use App\Models\Grade;
+use App\Models\KeyFeature;
+use App\Models\Industry;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+
 
 class ProductPortfolioController extends Controller
 {
@@ -29,41 +37,127 @@ class ProductPortfolioController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
     public function store(Request $request)
-    {
-        $request->validate([
-            'name'=>'required',
-            'slug'=>'required',
-            'image'=>'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'category_id'=>'required',    
-        ]);
-        
-       
-            $features = json_decode($request->features);
-            $imageName = time().'.'.$request->image->extension();
-            $request->image->move(public_path("product"),$imageName);
-            $product = new ApplicationProducts;
+    {   
+        try {
+            DB::beginTransaction(); // Start transaction
+
+            // Validate required fields
+           
+
+            $product = new ProductPortfolio();
+            $product->heading = $request->heading;
+            $product->sub_heading = $request->subheading;
             $product->name = $request->name;
-            $product->image = 'product/'.$imageName;
-            $product->slug = $request->slug;
             $product->description = $request->description;
-            $product->category_id = $request->category_id;
-            $product->features = $features;
+            $product->slug = $request->slug;
+
+            // Handle Image Upload for Product Portfolio
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $file_name = time() . '-' . $image->getClientOriginalName();
+                $file_path = 'productportfolio/' . $file_name;
+                $destinationPath = storage_path('app/public/productportfolio');
+                $image->move($destinationPath, $file_name);
+
+                $product->image = $file_path;
+            }
+
+            $product->grade_title = $request->grade_title;
+            $product->grade_description = $request->grade_description;
+            $product->key_feature_title = $request->feature_title;
+            $product->key_feature_description = $request->feature_description;
+            $product->indutry_title = $request->industry_title;            
             $product->save();
+        
+            // Store Features
+            if ($request->has('feature')) {
+                foreach ($request->feature as $feature) {
+                    FeatureSection::create([
+                        'product_portfolio_id' => $product->id,
+                        'title' => $feature['name'],
+                        'description' => $feature['description'],
+                    ]);
+                }
+            }
+
+            // Store Categories (Grades)
+            if ($request->has('category')) {
+                foreach ($request->category as $category) {
+                    Grade::create([
+                        'product_portfolio_id' => $product->id,
+                        'parent_category' => $category['parent'],
+                        'child_category' => $category['child'],
+                    ]);
+                }
+            }
+
+            // Store Key Features with Image Handling
+            if ($request->has('key_feature')) {
+                foreach ($request->key_feature as $key_feature) {
+                    // dd($key_feature);
+                    if (isset($key_feature['image']) && $key_feature['image'] instanceof \Illuminate\Http\UploadedFile) {
+                        $image = $key_feature['image'];
+                        $file_name = time() . '-' . $image->getClientOriginalName();
+                        $file_path = 'keyfeature/' . $file_name;
+                        $destinationPath = storage_path('app/public/keyfeature');
+                        $image->move($destinationPath, $file_name);
+                    } else {
+                        $file_path = null;
+                    }
+
+                    KeyFeature::create([
+                        'product_portfolio_id' => $product->id,
+                        'name' => $key_feature['name'],
+                        'description' => $key_feature['description'],
+                        'image' => $file_path,
+                    ]);
+                }
+            }
+
+            // Store Industries with Image Handling
+            if ($request->has('industry')) {
+                foreach ($request->industry as $industry) {
+                    if (isset($industry['image']) && $industry['image'] instanceof \Illuminate\Http\UploadedFile) {
+                        $image = $industry['image'];
+                        $file_name = time() . '-' . $image->getClientOriginalName();
+                        $file_path = 'industry/' . $file_name;
+                        $destinationPath = storage_path('app/public/industry');
+                        $image->move($destinationPath, $file_name);
+                    } else {
+                        $file_path = null;
+                    }
+
+                    Industry::create([
+                        'product_portfolio_id' => $product->id,
+                        'name' => $industry['name'],
+                        'image' => $file_path,
+                    ]);
+                }
+            }
+          
+            DB::commit(); // Commit transaction
+
             return back()->with('success', 'Product added successfully');
+        } catch (\Throwable $e) {
+            DB::rollBack(); // Rollback transaction
+            return back()->with('error', $e->getMessage());
+        }
     }
+
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request)
     {
         $offset = request('offset', 0);
         $limit = request('limit', 10);
         $sort = request('sort', 'id');
         $order = request('order', 'DESC');
 
-        $sql = ApplicationProducts::with('category')->where('id', '!=', 0);
+        $sql = ProductPortfolio::with('grade','keyFeature','industry','featureSection')->where('id', '!=', 0);
 
         if (!empty($_GET['search'])) {
             $search = $_GET['search'];
@@ -91,11 +185,12 @@ class ProductPortfolioController extends Controller
             
             $tempRow = $row->toArray();
             $tempRow['no'] = $no++;
+            $tempRow['heading'] = $row->heading;
+            $tempRow['sub_heading'] = $row->sub_heading;
+            $tempRow['description'] = $row->description;
+            $tempRow['name'] = $row->name;
             $tempRow['slug'] = $row->slug;
             $tempRow['image'] = $row->image;
-            $tempRow['category_id'] = $row->category_id;
-            $tempRow['category_name'] = $row->category->name;
-            $tempRow['description'] = $row->description;
             $tempRow['operate'] = $operate;
             $rows[] = $tempRow;
         }
@@ -108,11 +203,11 @@ class ProductPortfolioController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        $product = ApplicationProducts::findOrFail($id);
-        $categories = ApplicationCategory::select('name','slug','id')->get();
-        return view('admin.product-portfolio.edit',compact('categories','product'));
+        $product = ProductPortfolio::with('grade','keyFeature','industry','featureSection')->where('id',$id)->first();
+        // dd($product->toArray());
+        return view('admin.product-portfolio.edit',compact('product'));
     }
 
     /**
@@ -120,24 +215,109 @@ class ProductPortfolioController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $product = ApplicationProducts::findOrFail($id);
-        $request->validate([
-            'name'=>'required',
-            'slug'=>'required',
-            'category_id'=>'required',     
-        ]);
-        $product->name = $request->name;
-        $product->slug = $request->slug;
-        $product->category_id = $request->category_id;
-        $product->description = $request->description ?? $product->description;
-        $product->features = json_decode($request->features) ?? $product->features; 
-        if($request->image != null){
-            $imageName = time().'.'.$request->image->extension();
-            $request->image->move(public_path("product"),$imageName);
-            $product->image = 'product/' . $imageName;
+        try {
+           
+            DB::beginTransaction(); // Start transaction
+
+            $product = ProductPortfolio::findOrFail($id);
+            $product->heading = $request->heading;
+            $product->sub_heading = $request->subheading;
+            $product->name = $request->name;
+            $product->description = $request->description;
+            $product->slug = $request->slug;
+
+            // Handle Image Upload for Product Portfolio
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $file_name = time() . '-' . $image->getClientOriginalName();
+                $file_path = 'productportfolio/' . $file_name;
+                $destinationPath = storage_path('app/public/productportfolio');
+                $image->move($destinationPath, $file_name);
+
+                $product->image = $file_path;
+            }
+
+            $product->grade_title = $request->grade_title;
+            $product->grade_description = $request->grade_description;
+            $product->key_feature_title = $request->feature_title;
+            $product->key_feature_description = $request->feature_description;
+            $product->indutry_title = $request->industry_title;            
+            $product->save();
+            // dd($product);
+            // Store Features
+            if ($request->has('feature')) {
+                foreach ($request->feature as $feature) {
+                    FeatureSection::updateOrCreate(['id' => $feature['id'] ?? null],[
+                        'product_portfolio_id' => $product->id,
+                        'title' => $feature['name'],
+                        'description' => $feature['description'],
+                    ]);
+                    
+                }
+            }
+          
+            if ($request->has('category')) {
+                foreach ($request->category as $category) {
+                    Grade::updateOrCreate(['id' => $category['id'] ?? null],[
+                        'product_portfolio_id' => $product->id,
+                        'parent_category' => $category['parent'],
+                        'child_category' => $category['child'],
+                    ]);
+                }
+            }
+
+            // Store Key Features with Image Handling
+            if ($request->has('key_feature')) {
+                foreach ($request->key_feature as $key_feature) {
+                  
+                    if (isset($key_feature['image']) && $key_feature['image'] instanceof \Illuminate\Http\UploadedFile) {
+                        $image = $key_feature['image'];
+                        $file_name = time() . '-' . $image->getClientOriginalName();
+                        $file_path = 'keyfeature/' . $file_name;
+                        $destinationPath = storage_path('app/public/keyfeature');
+                        $image->move($destinationPath, $file_name);
+                    } else {
+                        $file_path = KeyFeature::find($key_feature['id'])->image ?? null;
+                    }
+
+                    KeyFeature::updateOrCreate([ 'id' => $key_feature['id'] ?? null],[
+                        'product_portfolio_id' => $product->id,
+                        'name' => $key_feature['name'],
+                        'description' => $key_feature['description'],
+                        'image' => $file_path,
+                    ]);
+                }
+            }
+
+            // Store Industries with Image Handling
+            if ($request->has('industry')) {
+                foreach ($request->industry as $industry) {
+                    if (isset($industry['image']) && $industry['image'] instanceof \Illuminate\Http\UploadedFile) {
+                        $image = $industry['image'];
+                        $file_name = time() . '-' . $image->getClientOriginalName();
+                        $file_path = 'industry/' . $file_name;
+                        $destinationPath = storage_path('app/public/industry');
+                        $image->move($destinationPath, $file_name);
+                    } else {
+                        $file_path = Industry::find($industry['id'])->image ?? null;
+                    }
+
+                    Industry::updateOrCreate(['id' => $industry['id'] ?? null],[
+                        'product_portfolio_id' => $product->id,
+                        'name' => $industry['name'],
+                        'image' => $file_path,
+                    ]);
+                }
+            }
+          
+            DB::commit(); // Commit transaction
+
+            return back()->with('success', 'Product Updated successfully');
+        } catch (\Throwable $e) {
+            dd($e->getMessage());
+            DB::rollBack(); // Rollback transaction
+            return back()->with('error', $e->getMessage());
         }
-        $product->save();
-        return back()->with("success","Product edit successfully");
     }
 
     /**
@@ -145,7 +325,40 @@ class ProductPortfolioController extends Controller
      */
     public function destroy(string $id)
     {
-        $res = ApplicationProducts::where('id',$id)->delete();
-        return back()->with('success', 'Product deleted successfully');
+        $product = ProductPortfolio::findOrFail($id);
+        $product->grade()->delete();
+        $product->keyFeature()->delete();
+        $product->industry()->delete();
+        $product->featureSection()->delete();
+        $product->delete();
+        return back()->with("success","Product Deleted Successfully");
     }
+
+    public function deleteFeature($id)
+    {
+        $feature = FeatureSection::findOrFail($id);
+        $feature->delete();
+        return back()->with("success","Feature Deleted Successfully");
+    }
+
+    public function deleteGrade($id)
+    {
+        $grade = Grade::findOrFail($id);
+        $grade->delete();
+        return back()->with("success","Grade Deleted Successfully");
+    }
+
+    public function deleteKeyFeature($id)
+    {
+        $keyFeature = KeyFeature::findOrFail($id);
+        $keyFeature->delete();
+        return back()->with("success","Key Feature Deleted Successfully");
+    }
+
+    public function deleteIndustry($id)
+    {
+        $industry = Industry::findOrFail($id);
+        $industry->delete();
+        return back()->with("success","Industry Deleted Successfully");
+    }   
 }
