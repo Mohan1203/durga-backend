@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Setting;
+use App\Models\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,7 +13,7 @@ class SettingContoller extends Controller
      */
     public function index()
     {
-        $settings = Setting::first();
+        $settings = Settings::first();
         return view('admin.settings', compact('settings'));
     }
 
@@ -38,7 +38,7 @@ class SettingContoller extends Controller
             'state_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $settings = Setting::first() ?? new Setting();
+        $settings = Settings::first() ?? new Settings();
 
         // Handle file uploads
         if ($request->hasFile('logo')) {
@@ -74,14 +74,14 @@ class SettingContoller extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Setting $setting)
+    public function show(Settings $setting)
     {
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Setting $setting)
+    public function edit(Settings $setting)
     {
         //
     }
@@ -91,7 +91,7 @@ class SettingContoller extends Controller
      */
     public function update(Request $request, $id)
     {
-        $settings = Setting::first() ?? new Setting();
+        $settings = Settings::first() ?? new Settings();
 
         if ($id == 1) {
             // Contact Information Update
@@ -134,7 +134,7 @@ class SettingContoller extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Setting $setting)
+    public function destroy(Settings $setting)
     {
         try {
             if ($setting->logo && file_exists(public_path($setting->logo))) {

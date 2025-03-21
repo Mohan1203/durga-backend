@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\user\application_categories;
 use App\Http\Controllers\user\application_product;
@@ -19,3 +20,7 @@ Route::post("/group_of_companies",[group_of_companies::class,'get_all_timeline']
 Route::post("/send_contact_email",[user_contact::class,'sendContactEmail']);
 
 Route::post("/setting",[setting::class,'index']);
+
+Route::get('/product-portfolio', [ApiController::class, 'getProductPortfolio']);
+
+Route::get('/product-portfolio/{slug}', [ApiController::class, 'getProductPortfolioDetail']);
