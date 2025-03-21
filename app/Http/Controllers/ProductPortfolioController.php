@@ -208,7 +208,13 @@ class ProductPortfolioController extends Controller
         $operate = "";
         foreach ($res as $row) {
             $operate = '<a href='.route('product-portfolio.edit',$row->id).' class="btn btn-xs btn-gradient-primary btn-rounded btn-icon edit-data" data-id=' . $row->id . ' title="Edit"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;';
-            $operate .= '<a href='.route('product-portfolio.destroy',$row->id).' class="btn btn-xs btn-gradient-danger btn-rounded btn-icon delete-form" data-id=' . $row->id . '><i class="fa fa-trash"></i></a>';
+            $operate .= '<form action="'.route('product-portfolio.destroy', $row->id).'" method="POST" style="display:inline;">
+            '.csrf_field().'
+            '.method_field('DELETE').'
+            <button type="submit" class="btn btn-xs btn-gradient-danger btn-rounded btn-icon" onclick="return confirm(\'Are you sure you want to delete this item?\')">
+                <i class="fa fa-trash"></i>
+            </button>
+            </form>';
             
             $tempRow = $row->toArray();
             $tempRow['no'] = $no++;

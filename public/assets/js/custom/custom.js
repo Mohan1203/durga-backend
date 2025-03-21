@@ -319,8 +319,8 @@ $(document).on('click', '.remove-feature', function (e) {
             if (result.isConfirmed) {
                 let data = null;
                 function successCallback(response) {
-                    window.location.reload(true);
                     showSuccessToast(response.message);
+                    window.location.reload(true);
                 }
     
                 function errorCallback(response) {
@@ -390,8 +390,8 @@ $(document).on('click', '.remove-category', function (e) {
             if (result.isConfirmed) {
                 let data = null;
                 function successCallback(response) {
-                    window.location.reload();
                     showSuccessToast(response.message);
+                    window.location.reload(true);
                 }
     
                 function errorCallback(response) {
@@ -453,8 +453,8 @@ $(document).on('click', '.remove-key-feature', function () {
             if (result.isConfirmed) {
                 let data = null;
                 function successCallback(response) {
-                    window.location.reload();
                     showSuccessToast(response.message);
+                    window.location.reload(true);
                 }
     
                 function errorCallback(response) {
@@ -488,7 +488,7 @@ $(document).on('click', '.add-industry', function (e) {
     });
 
     newRow.find('.img-thumbnail').attr('src', '').hide(); 
-    
+
     newRow.find('.add-industry')
     .removeClass('add-industry btn-primary')    
     .addClass('remove-industry btn-danger')
@@ -514,8 +514,8 @@ $(document).on('click', '.remove-industry', function () {
             if (result.isConfirmed) {
                 let data = null;
                 function successCallback(response) {
-                    window.location.reload();
                     showSuccessToast(response.message);
+                    window.location.reload(true);
                 }
     
                 function errorCallback(response) {
@@ -548,8 +548,8 @@ $(document).on('click', '.remove-grade', function () {
             if (result.isConfirmed) {
                 let data = null;
                 function successCallback(response) {
-                    window.location.reload();
                     showSuccessToast(response.message);
+                    window.location.reload(true);
                 }
     
                 function errorCallback(response) {

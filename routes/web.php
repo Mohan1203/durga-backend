@@ -37,7 +37,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete("/delete-grade/{id}",[ProductPortfolioController::class,"deleteGrade"])->name('grade.delete'); 
     Route::delete("/delete-industry/{id}",[ProductPortfolioController::class,"deleteIndustry"])->name('industry.delete');
     Route::delete("/delete-feature-section/{id}",[ProductPortfolioController::class,"deleteFeatureSection"])->name('feature-section.delete');
-    Route::delete("/delete-key-feature/{id}",[ProductPortfolioController::class,"deleteKeyFeature"])->name('handle.delete-key-feature');
+    Route::delete("/delete-key-feature/{id}",[ProductPortfolioController::class,"deleteKeyFeature"])->name('key-feature.delete');
     Route::resource('product-portfolio', ProductPortfolioController::class);
    
 

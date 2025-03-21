@@ -140,9 +140,9 @@
                                 <div class="form-group col-sm-12 col-md-2">
                                     <div class="mt-4">
                                         @if ($index == 0)
-                                            <button class="btn btn-primary add-grade" type="button">+</button>
+                                            <button class="btn btn-primary add-category" type="button">+</button>
                                         @else
-                                            <button class="btn btn-danger remove-grade" data-url="{{ url('delete-grade', $grade['id']) }}" data-id="{{ $grade['id'] }}" type="button">-</button>
+                                            <button class="btn btn-danger remove-category" data-url="{{ url('delete-grade', $grade['id']) }}" data-id="{{ $grade['id'] }}" type="button">-</button>
                                         @endif
                                     </div>                                    
                                 </div>                                
@@ -202,7 +202,7 @@
                                         @if ($index == 0)
                                             <button class="btn btn-primary add-key-feature" type="button">+</button>
                                         @else
-                                        <button class="btn btn-danger remove-key-feature" data-url="{{ url('delete-feature', $keyFeature['id']) }}" data-id="{{ $keyFeature['id'] }}">-</button>
+                                        <button class="btn btn-danger remove-key-feature" data-url="{{ url('delete-key-feature', $keyFeature['id']) }}" data-id="{{ $keyFeature['id'] }}" type="button">-</button>
                                     
                                         @endif
                                     </div>                                    

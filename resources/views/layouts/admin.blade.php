@@ -101,42 +101,6 @@
         </script>
     @endif
 
-<<<<<<< Updated upstream
-=======
-    <script>
-        $(document).on('click', '.deletedata', function() {
-            Swal.fire({
-                title: "{{ __('delete_title') }}",
-                text: "{{ __('confirm_message') }}",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: "{{ __('yes_delete') }}"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: $(this).attr('data-url'),
-                        type: "POST",
-                        data: {
-                            _method: "DELETE",
-                            _token: $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(response) {
-                            if (response['error'] == false) {
-                                showSuccessToast(response['message']);
-                                $('#table_list').bootstrapTable('refresh');
-                            } else {
-                                showErrorToast(response['message']);
-                            }
-                        }
-                    });
-                }
-            })
-        });
-    </script>
-
->>>>>>> Stashed changes
 </head>
 
 <body>
