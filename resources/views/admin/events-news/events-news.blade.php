@@ -7,7 +7,7 @@
     <div class="">
         <div class="page-header">
             <h3 class="page-title">
-                Manage Application Products
+                Manage Events & News
             </h3>
         </div>
         <div class="row">
@@ -15,7 +15,7 @@
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">
-                            Create Application Products
+                            Create Events & News
                         </h4>
 
                         <form class="pt-3 class-create-form" id="create-form" action="{{ route('events-and-news.store') }}"

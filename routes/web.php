@@ -31,6 +31,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     Route::resource('application-products', ApplicationProductController::class);
+    // Route::delete('application-products/{id}', [ApplicationProductController::class, 'destroy'])->name('application-products.destroy');
     
     Route::delete("/delete-feature/{id}",[ProductPortfolioController::class,"deleteFeature"])->name('feature.delete');
     Route::delete("/delete-grade/{id}",[ProductPortfolioController::class,"deleteGrade"])->name('grade.delete'); 
@@ -47,9 +48,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get("/show-group-of-company",[Group_of_companies_contoller::class,'handle_show_data'])->name("handle.show-grp-comp");
     Route::get("/show-edit-group-of-company/{id}",[Group_of_companies_contoller::class,'handle_show_edit'])->name("handle.show-edit-grp-comp");
     Route::post("/edit-group-of-company/{id}",[Group_of_companies_contoller::class,'handle_edit_data'])->name("handle.edit-grp-cmp");
-    Route::delete('/delete-group-of-comp/{id}',[Group_of_companies_contoller::class,'delete_timeline'])->name('handle.delete_timeline');
+    Route::post('/delete-group-of-comp/{id}',[Group_of_companies_contoller::class,'delete_timeline'])->name('handle.delete_timeline');
     
     Route::resource("/events-and-news",EventsAndNewsController::class);
+    // Route::delete("events-and-news/{id}",[EventsAndNewsController::class,'delete_event_news'])->name('handle.delete_event_news');
     Route::resource('/settings',SettingContoller::class);
     
     Route::get('/refresh-csrf', function() {

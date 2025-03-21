@@ -32,6 +32,8 @@ class ApiController extends Controller
     public function getProductPortfolioDetail(Request $request)
     {
         try {
+            $slug = $request->slug;
+    
             $productDetails = ProductPortfolio::with(['featureSection', 'grade', 'keyFeature', 'industry'])
                 ->where('slug', $request->slug)
                 ->first();

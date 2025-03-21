@@ -28,6 +28,7 @@ class EventsAndNewsController extends Controller
      */
     public function store(Request $request)
     {
+        
         $request->validate([
             'name'=>"required",
             "image"=>"required"  
@@ -46,6 +47,7 @@ class EventsAndNewsController extends Controller
      */
     public function show(Request $request)
     {
+     
         $offset = request('offset', 0);
         $limit = request('limit', 10);
         $sort = request('sort', 'id');
@@ -72,11 +74,12 @@ class EventsAndNewsController extends Controller
         foreach ($res as $row) {
             $operate = '<a href="'.route('events-and-news.edit', $row->id).'" class="btn btn-xs btn-gradient-primary btn-rounded btn-icon edit-data" data-id="' . $row->id . '" ><i class="fa fa-edit"></i></a>&nbsp;&nbsp;';
             $operate .= '<form action="'.route('events-and-news.destroy', $row->id).'" method="POST" style="display:inline;">
-            ' . csrf_field() . method_field('DELETE') . '
-            <button type="submit" class="btn btn-xs btn-gradient-danger btn-rounded btn-icon delete-form" onclick="return confirm(\'Are you sure?\')">
-                <i class="fa fa-trash"></i>
-            </button>
-        </form>';
+                '.csrf_field().'
+                '.method_field('DELETE').'
+                <button type="submit" class="btn btn-xs btn-gradient-danger btn-rounded btn-icon" onclick="return confirm(\'Are you sure you want to delete this item?\')">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </form>';
 
             $tempRow = $row->toArray();
             $tempRow['no'] = $no++;
@@ -124,7 +127,26 @@ class EventsAndNewsController extends Controller
      */
     public function destroy(Request $request,$id)
     {
-        $res = EventsNews::where('id',$id)->delete();
-        return back()->with('success', 'EventsNews deleted successfully');
+        try {
+            $event = EventsNews::findOrFail($id);
+            $event->delete();
+            
+            if($request->ajax()) {
+                return response()->json([
+                    'error' => false,
+                    'message' => 'Event deleted successfully'
+                ]);
+            }
+            
+            return back()->with('success', 'Event deleted successfully');
+        } catch (\Exception $e) {
+            if($request->ajax()) {
+                return response()->json([
+                    'error' => true,
+                    'message' => 'Error deleting event'
+                ]);
+            }
+            return back()->with('error', 'Error deleting event');
+        }
     }
 }

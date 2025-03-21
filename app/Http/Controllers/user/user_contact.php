@@ -33,6 +33,7 @@ class user_contact extends Controller
             ], 200);
 
         } catch (\Exception $e) {
+            dd($e);
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to send message. Please try again later.'

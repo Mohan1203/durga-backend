@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>@yield('title') Admin Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -72,7 +73,7 @@
     <script src="{{ asset('/assets/js/jquery.tagsinput.min.js') }}"></script>
     <script src="{{ asset('/assets/js/custom/custom.js') }}"></script>
     <script src="{{ asset('/assets/js/custom/custom-bootstrap-table.js') }}"></script>
-   
+
 
     @if ($errors->any())
         @foreach ($errors->all() as $error)
@@ -100,6 +101,42 @@
         </script>
     @endif
 
+<<<<<<< Updated upstream
+=======
+    <script>
+        $(document).on('click', '.deletedata', function() {
+            Swal.fire({
+                title: "{{ __('delete_title') }}",
+                text: "{{ __('confirm_message') }}",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: "{{ __('yes_delete') }}"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: $(this).attr('data-url'),
+                        type: "POST",
+                        data: {
+                            _method: "DELETE",
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            if (response['error'] == false) {
+                                showSuccessToast(response['message']);
+                                $('#table_list').bootstrapTable('refresh');
+                            } else {
+                                showErrorToast(response['message']);
+                            }
+                        }
+                    });
+                }
+            })
+        });
+    </script>
+
+>>>>>>> Stashed changes
 </head>
 
 <body>

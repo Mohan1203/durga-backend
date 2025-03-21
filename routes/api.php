@@ -23,4 +23,8 @@ Route::post("/setting",[setting::class,'index']);
 
 Route::post('/product_portfolio', [ApiController::class, 'getProductPortfolio']);
 
+<<<<<<< Updated upstream
 Route::post('/get_product_portfolio_details', [ApiController::class, 'getProductPortfolioDetail']);
+=======
+Route::post('/product_portfolio/{slug}', [ApiController::class, 'getProductPortfolioDetail']);
+>>>>>>> Stashed changes
