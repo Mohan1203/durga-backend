@@ -308,33 +308,28 @@ $(document).on('click', '.remove-feature', function (e) {
 
     if(id != null && url != null) {
         Swal.fire({
-            title: "Delete Title",
-            text: "Confirm Message",
-            icon: 'Warning',
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: "Yes Delete"
-        })          
-        .then((result) => {
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    url: url,
-                    type: "DELETE",
-                    success: function(response) {
-                        if (response['error'] == false) {
-                            showSuccessToast(response['message']);
-                            $('#table_list').bootstrapTable('refresh');
-                        }
-
-                        if (response['error'] == true) {
-                            showErrorToast(response['message']);
-                        }
-                    }
-                })
+                let data = null;
+                function successCallback(response) {
+                    window.location.reload(true);
+                    showSuccessToast(response.message);
+                }
+    
+                function errorCallback(response) {
+                    showErrorToast(response.message);
+                }
+    
+                ajaxRequest('DELETE', url, data, null, successCallback, errorCallback); 
             }
-        });
-
+        })
     }else{
         $(this).closest('.feature-row').remove();
     }   
@@ -391,25 +386,21 @@ $(document).on('click', '.remove-category', function (e) {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!'
-        })          
-        .then((result) => {
+        }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    url: url,
-                    type: "DELETE",
-                    success: function(response) {
-                        if (response['error'] == false) {
-                            showSuccessToast(response['message']);
-                            $('#table_list').bootstrapTable('refresh');
-                        }
-
-                        if (response['error'] == true) {
-                            showErrorToast(response['message']);
-                        }
-                    }
-                })
+                let data = null;
+                function successCallback(response) {
+                    window.location.reload();
+                    showSuccessToast(response.message);
+                }
+    
+                function errorCallback(response) {
+                    showErrorToast(response.message);
+                }
+    
+                ajaxRequest('DELETE', url, data, null, successCallback, errorCallback); 
             }
-        });
+        })
 
     }else{
         $(this).closest('.category-row').remove();
@@ -435,6 +426,8 @@ $(document).on('click', '.add-key-feature', function (e) {
         $(this).val('');
     });
 
+    newRow.find('.img-thumbnail').attr('src', '').hide(); 
+
     newRow.find('.add-key-feature')
     .removeClass('add-key-feature btn-primary')    
     .addClass('remove-key-feature btn-danger')
@@ -458,18 +451,17 @@ $(document).on('click', '.remove-key-feature', function () {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    url: $url,
-                    type: "DELETE",
-                    success: function(response) {
-                        if (response['error'] == false) {
-                            showSuccessToast(response['message']);
-                            $('#table_list').bootstrapTable('refresh');
-                        } else {
-                            showErrorToast(response['message']);
-                        }
-                    }
-                });
+                let data = null;
+                function successCallback(response) {
+                    window.location.reload();
+                    showSuccessToast(response.message);
+                }
+    
+                function errorCallback(response) {
+                    showErrorToast(response.message);
+                }
+    
+                ajaxRequest('DELETE', url, data, null, successCallback, errorCallback); 
             }
         })
     }else{
@@ -495,6 +487,8 @@ $(document).on('click', '.add-industry', function (e) {
         $(this).val('');
     });
 
+    newRow.find('.img-thumbnail').attr('src', '').hide(); 
+    
     newRow.find('.add-industry')
     .removeClass('add-industry btn-primary')    
     .addClass('remove-industry btn-danger')
@@ -518,18 +512,17 @@ $(document).on('click', '.remove-industry', function () {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    url: url,
-                    type: "DELETE",
-                    success: function(response) {
-                        if (response['error'] == false) {
-                            showSuccessToast(response['message']);
-                            $('#table_list').bootstrapTable('refresh');
-                        } else {
-                            showErrorToast(response['message']);
-                        }
-                    }
-                });
+                let data = null;
+                function successCallback(response) {
+                    window.location.reload();
+                    showSuccessToast(response.message);
+                }
+    
+                function errorCallback(response) {
+                    showErrorToast(response.message);
+                }
+    
+                ajaxRequest('DELETE', url, data, null, successCallback, errorCallback); 
             }
         })
     }else{
@@ -553,17 +546,17 @@ $(document).on('click', '.remove-grade', function () {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    url: url,
-                    type: "DELETE",
-                    success: function(response) {
-                        if (response['error'] == false) {
-                            showSuccessToast(response['message']);
-                        } else {
-                            showErrorToast(response['message']);
-                        }
-                    }
-                });
+                let data = null;
+                function successCallback(response) {
+                    window.location.reload();
+                    showSuccessToast(response.message);
+                }
+    
+                function errorCallback(response) {
+                    showErrorToast(response.message);
+                }
+    
+                ajaxRequest('DELETE', url, data, null, successCallback, errorCallback); 
             }
         })
     }else{

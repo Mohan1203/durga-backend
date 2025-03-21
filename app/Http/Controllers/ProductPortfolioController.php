@@ -41,14 +41,39 @@ class ProductPortfolioController extends Controller
      */
 
     public function store(Request $request)
-    {   
-        // dd($request->all());
+    {    
         try {
+
+            $request->validate([
+                'heading' => 'required|string|max:255',
+                'subheading' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'slug' => 'required|string|unique:product_portfolios,slug|max:255',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'grade_title' => 'required|string|max:255',
+                'feature_title' => 'required|string|max:255',
+                'feature_description' => 'required|string',
+                'industry_title' => 'required|string|max:255',
+                'feature' => 'required|array',
+                'feature.*.name' => 'required|string|max:255',
+                'feature.*.description' => 'required|string',
+                'category' => 'required|array',
+                'category.*.parent_category' => 'required|string|max:255',
+                'category.*.child_category' => 'required|string',
+                'key_feature' => 'required|array',
+                'key_feature.*.name' => 'required|string|max:255',
+                'key_feature.*.description' => 'required|string',
+                'key_feature.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'industry' => 'required|array',
+                'industry.*.name' => 'required|string|max:255',
+                'industry.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
+
             DB::beginTransaction(); // Start transaction
 
             // Validate required fields
            
-
             $product = new ProductPortfolio();
             $product->heading = $request->heading;
             $product->sub_heading = $request->subheading;
@@ -143,7 +168,6 @@ class ProductPortfolioController extends Controller
 
             return back()->with('success', 'Product added successfully');
         } catch (\Throwable $e) {
-            dd($e->getMessage());
             DB::rollBack(); // Rollback transaction
             return back()->with('error', $e->getMessage());
         }
@@ -220,7 +244,30 @@ class ProductPortfolioController extends Controller
     {   
         // dd($request->all());
         try {
-           
+            $request->validate([
+                'heading' => 'required|string|max:255',
+                'subheading' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'slug' => 'required|string|max:255|unique:product_portfolios,slug,' . $id,
+                'grade_title' => 'required|string|max:255',
+                'feature_title' => 'required|string|max:255',
+                'feature_description' => 'required|string',
+                'industry_title' => 'required|string|max:255',
+                'feature' => 'required|array',
+                'feature.*.name' => 'required|string|max:255',
+                'feature.*.description' => 'required|string',
+                'category' => 'required|array',
+                'category.*.parent_category' => 'required|string|max:255',
+                'category.*.child_category' => 'required|string',
+                'key_feature' => 'required|array',
+                'key_feature.*.name' => 'required|string|max:255',
+                'key_feature.*.description' => 'required|string',
+                'industry' => 'required|array',
+                'industry.*.name' => 'required|string|max:255',
+            ]);
+
+
             DB::beginTransaction(); // Start transaction
 
             $product = ProductPortfolio::findOrFail($id);
@@ -317,7 +364,6 @@ class ProductPortfolioController extends Controller
 
             return back()->with('success', 'Product Updated successfully');
         } catch (\Throwable $e) {
-            dd($e->getMessage());
             DB::rollBack(); // Rollback transaction
             return back()->with('error', $e->getMessage());
         }
@@ -328,40 +374,61 @@ class ProductPortfolioController extends Controller
      */
     public function destroy(string $id)
     {
-        $product = ProductPortfolio::findOrFail($id);
-        $product->grade()->delete();
-        $product->keyFeature()->delete();
-        $product->industry()->delete();
-        $product->featureSection()->delete();
-        $product->delete();
-        return back()->with("success","Product Deleted Successfully");
+        try{
+            $product = ProductPortfolio::findOrFail($id);
+            $product->grade()->delete();
+            $product->keyFeature()->delete();
+            $product->industry()->delete();
+            $product->featureSection()->delete();
+            $product->delete();
+            return back()->with("success","Product Deleted Successfully");
+        }catch(QueryException $e){
+            return back()->with("error","Product not found");
+        }
     }
 
     public function deleteFeature($id)
     {
-        $feature = FeatureSection::findOrFail($id);
-        $feature->delete();
-        return back()->with("success","Feature Deleted Successfully");
+        try{
+            $feature = FeatureSection::findOrFail($id);
+            $feature->delete();
+            return response()->json(['message' => 'Feature Deleted successfully'], 200);
+        }catch(QueryException $e){
+            return response()->json(['message' => 'Error deleting Feature', 'error' => $e->getMessage()], 500);
+        }
     }
 
     public function deleteGrade($id)
     {
-        $grade = Grade::findOrFail($id);
-        $grade->delete();
-        return back()->with("success","Grade Deleted Successfully");
+        try {
+            $grade = Grade::findOrFail($id);
+            $grade->delete();
+            return response()->json(['message' => 'Grade deleted successfully'], 200);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Grade not found'], 404);
+        }
     }
 
     public function deleteKeyFeature($id)
     {
-        $keyFeature = KeyFeature::findOrFail($id);
-        $keyFeature->delete();
-        return back()->with("success","Key Feature Deleted Successfully");
+        try {
+            $keyFeature = KeyFeature::findOrFail($id);
+            $keyFeature->delete();
+            return response()->json(['message' => 'Key Feature deleted successfully'], 200);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Key Feature not found'], 404);
+        }
     }
 
     public function deleteIndustry($id)
     {
-        $industry = Industry::findOrFail($id);
-        $industry->delete();
-        return back()->with("success","Industry Deleted Successfully");
-    }   
+        try {
+            $industry = Industry::findOrFail($id);
+            $industry->delete();
+            return response()->json(['message' => 'Industry deleted successfully'], 200);
+        } catch (QueryException $e) {
+            return response()->json(['message' => 'Industry not found'], 404);
+        }
+    }
+
 }

@@ -99,31 +99,4 @@ function formAjaxRequest(type, url, data, formElement, submitButtonElement, succ
     }
 }
 
-/**
- *
- * @param searchElement
- * @param searchUrl
- * @param data Object
- * @param placeHolder
- * @param templateDesignEvent
- * @param onTemplateSelectEvent
- */
 
-
-function convertTimeRange(timeRange) {
-
-    var formattedRange = timeRange.replace(' to ', ' - ');
-    return formattedRange;
-}
-
-function convertDateRange(dateRange) {
-    return dateRange.replace(' to ', ' - ');
-}
-
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-}

@@ -29,11 +29,11 @@ class ApiController extends Controller
         }
     }
 
-    public function getProductPortfolioDetail($slug)
+    public function getProductPortfolioDetail(Request $request)
     {
         try {
             $productDetails = ProductPortfolio::with(['featureSection', 'grade', 'keyFeature', 'industry'])
-                ->where('slug', $slug)
+                ->where('slug', $request->slug)
                 ->first();
 
             if ($productDetails) {

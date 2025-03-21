@@ -5,6 +5,16 @@
             <h3 class="page-title">
                 Manage Products Portfolio
             </h3>
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
         </div>
         <div class="row">
             <div class="col-md-12 grid-margin stretch-card">
@@ -20,28 +30,45 @@
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Heading</label>
                                     <input name="heading" type="text" placeholder="Enter Title Name" class="form-control" />
+                                    @error('heading')
+                                        <span class="text-danger mt-5">{{ $message }}</span>
+                                    @enderror
                                 </div>
-                                <div class="form-group col-sm-12 col-md-5">
+                                <div class="form-group col-sm-12 col-md-6">
                                     <label>Sub Heading</label>
                                     <textarea name="subheading" type="text" class="form-control"></textarea>
+                                    @error('subheading')
+                                    <span class="text-danger mt-5">{{ $message }}</span>
+                                @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Name</label>
-                                    <input name="name" type="text" placeholder="Enter Product Name"
-                                        class="form-control" />
+                                    <input name="name" type="text" placeholder="Enter Product Name" class="form-control" />
+                                    @error('name')
+                                    <span class="text-danger mt-5">{{ $message }}</span>
+                                @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Description</label>
                                     <textarea name="description" type="text" class="form-control"></textarea>
+                                    @error('description')
+                                    <span class="text-danger mt-5">{{ $message }}</span>
+                                @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Slug<span class="text-danger">*</span></label>
                                     <input name="slug" type="text" placeholder="Enter Slug Name"
                                         class="form-control" />
+                                        @error('slug')
+                                            <span class="text-danger mt-5">{{ $message }}</span>    
+                                        @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Images</label>
                                     <input type="file" name="image"  accept="image/*" class="form-control" />
+                                    @error('image')
+                                        <span class="text-danger mt-5">{{ $message }}</span>
+                                    @enderror   
                                 </div>
                             </div>
                             <h4>Features Sections</h4>
@@ -50,11 +77,17 @@
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Title<span class="text-danger">*</span></label>
                                     <input name="feature[0][name]" type="text" placeholder="Product Title"
-                                        class="form-control" />
+                                        class="form-control" /> 
+                                        @error('feature[0][name]')
+                                            <span class="text-danger mt-5">{{ $message }}</span>    
+                                        @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Description<span class="text-danger">*</span></label>
                                     <textarea name="feature[0][description]" type="text" class="form-control"></textarea>
+                                        @error('feature[0][description]')
+                                            <span class="text-danger mt-5">{{ $message }}</span>    
+                                        @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-2">
                                     <div class="mt-4">
@@ -69,16 +102,25 @@
                                 <div class="form-group col-sm-12 col-md-12">
                                     <label>Title</label>
                                     <input name="grade_title" type="text" placeholder="Enter Title Name" class="form-control" />
+                                    @error('grade_title')
+                                        <span class="text-danger mt-5">{{ $message }}</span>    
+                                    @enderror
                                 </div>
                             </div>
                             <div class="row category-row">
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Parent Category</label>
                                     <input name="category[0][parent_category]" type="text" placeholder="Enter Title Name" class="form-control" />
+                                    @error('category[0][parent_category]')
+                                        <span class="text-danger mt-5">{{ $message }}</span>
+                                    @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Child Category</label>
                                     <textarea name="category[0][child_category]" type="text" class="form-control"></textarea>
+                                    @error('category[0][child_category]')
+                                        <span class="text-danger mt-5">{{ $message }}</span>                                    
+                                    @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-2">
                                     <div class="mt-4">
@@ -94,20 +136,32 @@
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Heading</label>
                                     <input name="feature_title" type="text" placeholder="Enter Title Name" class="form-control" />
+                                    @error('feature_title')
+                                        <span class="text-danger mt-5">{{ $message }}</span>    
+                                    @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>SubHeading</label>
                                     <textarea name="feature_description" type="text" class="form-control"></textarea>
+                                    @error('feature_description')
+                                        <span class="text-danger mt-5">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="row key-feature-row">
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Title</label>                                    
                                     <input name="key_feature[0][name]" type="text" placeholder="Enter Title Name" class="form-control" />
+                                    @error('key_feature[0][name]')
+                                        <span class="text-danger mt-5">{{ $message }}</span>    
+                                    @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Description</label>
                                     <textarea name="key_feature[0][description]" type="text" class="form-control"></textarea>
+                                    @error('key_feature[0][description]')
+                                        <span class="text-danger mt-5">{{ $message }}</span>    
+                                    @enderror
                                 </div> 
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Images</label>
@@ -129,16 +183,25 @@
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Title</label>
                                     <input name="industry_title" type="text" placeholder="Enter Title Name" class="form-control" />
+                                    @error('industry_title')
+                                        <span class="text-danger mt-5">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="row industry-row">
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Name</label>                                    
                                     <input name="industry[0][name]" type="text" placeholder="Enter Title Name" class="form-control" />
+                                    @error('industry[0][name]')
+                                        <span class="text-danger mt-5">{{ $message }}</span>    
+                                    @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Images</label>
                                     <input type="file" name="industry[0][image]" class="form-control" multiple />
+                                    @error('industry[0][image]')
+                                        <span class="text-danger mt-5">{{ $message }}</span>    
+                                    @enderror
                                 </div>                               
                                 <div class="form-group col-sm-12 col-md-2">
                                     <div class="mt-4">
