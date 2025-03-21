@@ -21,6 +21,6 @@ Route::post("/send_contact_email",[user_contact::class,'sendContactEmail']);
 
 Route::post("/setting",[setting::class,'index']);
 
-Route::get('/product-portfolio', [ApiController::class, 'getProductPortfolio']);
+Route::get('/product_portfolio', [ApiController::class, 'getProductPortfolio']);
 
-Route::get('/product-portfolio/{slug}', [ApiController::class, 'getProductPortfolioDetail']);
+Route::get('/product_portfolio/{slug}', [ApiController::class, 'getProductPortfolioDetail']);

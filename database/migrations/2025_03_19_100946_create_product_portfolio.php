@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string("slug")->unique();
             $table->string("image")->nullable();
             $table->string("grade_title");
-            $table->text("grade_description");
             $table->string("key_feature_title");
             $table->text("key_feature_description");
             $table->string("indutry_title");

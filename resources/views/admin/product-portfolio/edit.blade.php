@@ -44,7 +44,7 @@
                                 <input type="file" name="image"  accept="image/*" class="form-control" />
                                 <input type="hidden" name="image" value="{{ $product->image }}" />
                                 @if($product->image != null)
-                                    <img src="{{ $product->image }}" alt="image" class="img-thumbnail" style="width: 100px; height: 100px;">                                    
+                                    <img src="{{ url(Storage::url($product->image)) }}" alt="image" class="img-thumbnail" style="width: 100px; height: 100px;">
                                 @endif
                             </div>
                         </div>
@@ -78,25 +78,21 @@
                         <h4>Our Grades Section</h4>
                         <hr>
                         <div class="row">
-                            <div class="form-group col-sm-12 col-md-6">
+                            <div class="form-group col-sm-12 col-md-12">
                                 <label>Title</label>
                                 <input name="grade_title" type="text" placeholder="Enter Title Name" class="form-control" value="{{ $product->grade_title }}" />
-                            </div>
-                            <div class="form-group col-sm-12 col-md-6">
-                                <label>Description</label>
-                                <textarea name="grade_description" type="text" class="form-control">{{ $product->grade_description }}</textarea>
                             </div>
                         </div>
                         @foreach ($product->grade as $index => $grade)
                             <div class="row category-row">
-                                <input type="hidden" name="grade[{{ $index }}][id]" value="{{ $grade['id'] }}"/>
+                                <input type="hidden" name="category[{{ $index }}][id]" value="{{ $grade['id'] }}"/>
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Parent Category</label>
-                                    <input name="grade[{{ $index }}][parent_category]" type="text" placeholder="Enter Title Name" class="form-control" value="{{ $grade['parent_category'] }}" />
+                                    <input name="category[{{ $index }}][parent_category]" type="text" placeholder="Enter Title Name" class="form-control" value="{{ $grade['parent_category'] }}" />
                                 </div>
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Child Category</label>
-                                    <input name="grade[{{ $index }}][child_category]" id="tags" class="form-control" value="{{ $grade['child_category'] }}"/>
+                                    <textarea name="category[{{ $index }}][child_category]" type="text" class="form-control">{{ isset($grade['child_category']) ? implode(',', json_decode($grade['child_category'], true)) : '' }}</textarea>
                                 </div>
                                 <div class="form-group col-sm-12 col-md-2">
                                     <div class="mt-4">
@@ -140,7 +136,7 @@
                                     <label>Images</label>
                                     <input type="file" name="key_feature[{{ $index }}][image]" class="form-control"/>
                                     @if($keyFeature['image'] !== null)
-                                        <img src="{{ $keyFeature['image'] }}" alt="image" class="img-thumbnail" style="width: 100px; height: 100px;">
+                                        <img src="{{ url(Storage::url($keyFeature['image'])) }}" alt="image" class="img-thumbnail" style="width: 100px; height: 100px;">
                                     @endif
                                 </div>                               
                                 <div class="form-group col-sm-12 col-md-2">
@@ -176,7 +172,7 @@
                                     <label>Images</label>
                                     <input type="file" name="industry[{{ $index }}][image]" class="form-control"/>
                                     @if($industry['image'] != null)
-                                        <img src="{{ $industry['image'] }}" alt="image" class="img-thumbnail" style="width: 100px; height: 100px;">
+                                        <img src="{{ url(Storage::url($industry['image'])) }}" alt="image" class="img-thumbnail" style="width: 100px; height: 100px;">
                                     @endif                                    
                                 </div>                               
                                 <div class="form-group col-sm-12 col-md-2">

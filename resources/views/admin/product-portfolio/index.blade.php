@@ -66,23 +66,19 @@
                             <h4>Our Grades Section</h4>
                             <hr>
                             <div class="row">
-                                <div class="form-group col-sm-12 col-md-6">
+                                <div class="form-group col-sm-12 col-md-12">
                                     <label>Title</label>
                                     <input name="grade_title" type="text" placeholder="Enter Title Name" class="form-control" />
-                                </div>
-                                <div class="form-group col-sm-12 col-md-6">
-                                    <label>Description</label>
-                                    <textarea name="grade_description" type="text" class="form-control"></textarea>
                                 </div>
                             </div>
                             <div class="row category-row">
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Parent Category</label>
-                                    <input name="category[0][parent]" type="text" placeholder="Enter Title Name" class="form-control" />
+                                    <input name="category[0][parent_category]" type="text" placeholder="Enter Title Name" class="form-control" />
                                 </div>
                                 <div class="form-group col-sm-12 col-md-5">
                                     <label>Child Category</label>
-                                    <input name="category[0][child]" id="tags" class="form-control" value=""/>
+                                    <textarea name="category[0][child_category]" type="text" class="form-control"></textarea>
                                 </div>
                                 <div class="form-group col-sm-12 col-md-2">
                                     <div class="mt-4">
@@ -194,4 +190,21 @@
             </div>
         </div>
     </div>
+@endsection
+@section('script')
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let nameInput = document.querySelector("input[name='name']");
+            let slugInput = document.querySelector("input[name='slug']");
+        
+            nameInput.addEventListener("keyup", function () {
+                let slug = nameInput.value
+                    .toLowerCase()           // Convert to lowercase
+                    .replace(/ /g, "-")       // Replace spaces with hyphens
+                    .replace(/[^a-z0-9-]/g, ""); // Remove special characters
+        
+                slugInput.value = slug;
+            });
+        });
+    </script>
 @endsection

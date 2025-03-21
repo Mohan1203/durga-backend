@@ -10,8 +10,10 @@ use App\Models\FeatureSection;
 use App\Models\Grade;
 use App\Models\KeyFeature;
 use App\Models\Industry;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Database\QueryException;
 
 
 class ProductPortfolioController extends Controller
@@ -40,6 +42,7 @@ class ProductPortfolioController extends Controller
 
     public function store(Request $request)
     {   
+        // dd($request->all());
         try {
             DB::beginTransaction(); // Start transaction
 
@@ -65,7 +68,6 @@ class ProductPortfolioController extends Controller
             }
 
             $product->grade_title = $request->grade_title;
-            $product->grade_description = $request->grade_description;
             $product->key_feature_title = $request->feature_title;
             $product->key_feature_description = $request->feature_description;
             $product->indutry_title = $request->industry_title;            
@@ -87,8 +89,8 @@ class ProductPortfolioController extends Controller
                 foreach ($request->category as $category) {
                     Grade::create([
                         'product_portfolio_id' => $product->id,
-                        'parent_category' => $category['parent'],
-                        'child_category' => $category['child'],
+                        'parent_category' => $category['parent_category'],
+                        'child_category' => json_encode(explode(',', $category['child_category'])),
                     ]);
                 }
             }
@@ -141,6 +143,7 @@ class ProductPortfolioController extends Controller
 
             return back()->with('success', 'Product added successfully');
         } catch (\Throwable $e) {
+            dd($e->getMessage());
             DB::rollBack(); // Rollback transaction
             return back()->with('error', $e->getMessage());
         }
@@ -190,7 +193,7 @@ class ProductPortfolioController extends Controller
             $tempRow['description'] = $row->description;
             $tempRow['name'] = $row->name;
             $tempRow['slug'] = $row->slug;
-            $tempRow['image'] = $row->image;
+            $tempRow['image'] = url(Storage::url($row->image)); 
             $tempRow['operate'] = $operate;
             $rows[] = $tempRow;
         }
@@ -214,7 +217,8 @@ class ProductPortfolioController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
+    {   
+        // dd($request->all());
         try {
            
             DB::beginTransaction(); // Start transaction
@@ -238,12 +242,11 @@ class ProductPortfolioController extends Controller
             }
 
             $product->grade_title = $request->grade_title;
-            $product->grade_description = $request->grade_description;
             $product->key_feature_title = $request->feature_title;
             $product->key_feature_description = $request->feature_description;
             $product->indutry_title = $request->industry_title;            
             $product->save();
-            // dd($product);
+          
             // Store Features
             if ($request->has('feature')) {
                 foreach ($request->feature as $feature) {
@@ -255,13 +258,13 @@ class ProductPortfolioController extends Controller
                     
                 }
             }
-          
+            //  dd($request->all());
             if ($request->has('category')) {
                 foreach ($request->category as $category) {
                     Grade::updateOrCreate(['id' => $category['id'] ?? null],[
                         'product_portfolio_id' => $product->id,
-                        'parent_category' => $category['parent'],
-                        'child_category' => $category['child'],
+                        'parent_category' => $category['parent_category'],
+                        'child_category' => json_encode(explode(',', $category['child_category'])),
                     ]);
                 }
             }
