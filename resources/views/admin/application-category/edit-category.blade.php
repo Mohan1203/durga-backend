@@ -49,7 +49,7 @@
                             <label for="{{ $field['name'] }}">{{ $field['label'] }}</label>
                             <input type="{{ $field['type'] }}" name="{{ $field['name'] }}" class="form-control"
                                 id="{{ $field['name'] }}" placeholder="{{ $field['placeholder'] }}"
-                                value={{ old($field['name'], $category->{$field['name']}) }}>
+                                value="{{ old($field['name'], $category->{$field['name']}) }}">
                             @error($field['name'])
                                 <span class="text-danger ">{{ $message }}</span>
                             @enderror

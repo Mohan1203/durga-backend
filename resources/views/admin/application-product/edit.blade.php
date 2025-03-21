@@ -151,9 +151,10 @@
                             </div>
                         </div>
                     @else
+                        {{-- {{ dd($product->{$field['name']}) }} --}}
                         <input type="{{ $field['type'] }}" name="{{ $field['name'] }}" class="form-control"
                             id="{{ $field['name'] }}" placeholder="{{ $field['placeholder'] }}"
-                            value={{ old($field['name'], $product->{$field['name']}) }}>
+                            value="{{ old($field['name'], $product->{$field['name']}) }}">
                     @endif
                     @error($field['name'])
                         <span class="text-danger mt-5">{{ $message }}</span>

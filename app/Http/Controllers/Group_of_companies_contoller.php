@@ -57,13 +57,12 @@ class Group_of_companies_contoller
             $operate = "";
             foreach ($res as $row) {
                 $operate = '<a href='.route('handle.show-edit-grp-comp',$row->id).' class="btn btn-xs btn-gradient-primary btn-rounded btn-icon edit-data" data-id=' . $row->id . ' title="Edit"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;';
-                $operate .= '<form action="' . route('handle.delete_timeline', $row->id) . '" method="DELETE" class="d-inline delete-form" >
-                ' . csrf_field() . '
-                <input type="hidden" name="_method" value="DELETE">
-                <button type="submit" class="btn btn-xs btn-gradient-danger btn-rounded btn-icon">
+                
+                // Use a button with data attributes instead of a form
+                $operate .= '<button type="button" class="btn btn-xs btn-gradient-danger btn-rounded btn-icon delete-timeline" data-id="' . $row->id . '" data-url="' . route('handle.delete_timeline', $row->id) . '">
                     <i class="fa fa-trash"></i>
-                </button>
-            </form>';
+                </button>';
+                
                 $tempRow = $row->toArray();
                 $tempRow['no'] = $no++;
                 $tempRow['year'] = $row->year;
@@ -101,9 +100,29 @@ class Group_of_companies_contoller
         return redirect()->to('/group-of-companies');   
     }
 
-    public function delete_timeline(Request $request,  $id){
-        $res = Timeline::where('id',$id)->delete();
-        return back()->with('success', 'Timeline deleted successfully');
+    public function delete_timeline(Request $request, $id){
+        try {
+            $timeline = Timeline::findOrFail($id);
+            
+            // Delete image if exists
+            if ($timeline->image && file_exists(public_path($timeline->image))) {
+                unlink(public_path($timeline->image));
+            }
+            
+            $timeline->delete();
+            
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Timeline deleted successfully']);
+            }
+            
+            return back()->with('success', 'Timeline deleted successfully');
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Error deleting timeline: ' . $e->getMessage()], 500);
+            }
+            
+            return back()->with('error', 'Error deleting timeline: ' . $e->getMessage());
+        }
     }
 
     

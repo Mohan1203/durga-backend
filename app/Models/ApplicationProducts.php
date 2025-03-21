@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class ApplicationProducts extends Model
 {
@@ -22,5 +23,10 @@ class ApplicationProducts extends Model
     {
         return $this->belongsTo(ApplicationCategory::class,'category_id');
     }
+
+    // public function getImageAttribute($value)
+    // {
+    //     return url(Storage::url($value));
+    // }
 
 }   
