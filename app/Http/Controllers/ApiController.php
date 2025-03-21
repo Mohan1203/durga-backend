@@ -10,7 +10,11 @@ class ApiController extends Controller
     public function getProductPortfolio()
     {
         try {
-            $products = ProductPortfolio::all(); 
+            $products = ProductPortfolio::all()->map(function ($product) {
+                $product->image = url('storage/' . $product->image); // Adjust the path as needed
+                return $product;
+            });
+           
             return response()->json([
                 'success' => true,
                 'data' => $products
@@ -28,7 +32,32 @@ class ApiController extends Controller
     public function getProductPortfolioDetail($slug)
     {
         try {
-            $productDetails = ProductPortfolio::with('featureSection','grade','keyFeature','industry')->where('slug', $slug)->first();
+            $productDetails = ProductPortfolio::with(['featureSection', 'grade', 'keyFeature', 'industry'])
+                ->where('slug', $slug)
+                ->first();
+
+            if ($productDetails) {
+                $productDetails->image = url('storage/' . $productDetails->image);
+
+                foreach (['featureSection', 'grade', 'keyFeature', 'industry'] as $relation) {
+                    if ($productDetails->$relation) {
+                        foreach ($productDetails->$relation as $item) {
+                            if (isset($item->image)) {
+                                $item->image = url('storage/' . $item->image);
+                            }
+                            if ($relation === 'grade' && isset($item->child_category)) {
+                                $decoded = json_decode($item->child_category, true);
+                                if (is_string($decoded)) {
+                                    $item->child_category = json_decode($decoded, true);
+                                } else {
+                                    $item->child_category = $decoded;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
 
             if (!$productDetails) {
                 return response()->json([
