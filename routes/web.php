@@ -16,6 +16,7 @@ use App\Http\Controllers\SettingContoller;
 
 Route::get('/login', [auth_controller::class, 'show_login'])->name('login');
 Route::post('/login', [auth_controller::class, 'handle_login'])->name('handle.login');
+Route::post('/logout', [auth_controller::class, 'logout'])->name('logout');
 
 // Route::middleware(['auth'])->get('/', [Dashboard_controller::class,'show_dashboard'])->name('home');
 

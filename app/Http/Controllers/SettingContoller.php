@@ -91,7 +91,11 @@ class SettingContoller extends Controller
      */
     public function update(Request $request, $id)
     {
+<<<<<<< Updated upstream
         $settings = Settings::first() ?? new Settings();
+=======
+        $settings = Settings::first() ?? new Settins();
+>>>>>>> Stashed changes
 
         if ($id == 1) {
             // Contact Information Update

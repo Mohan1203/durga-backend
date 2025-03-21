@@ -13,6 +13,12 @@ class application_product
             $appUrl = env("APP_URL",$request->getSchemeAndHttpHost());
             if($slug){
                 $product = ApplicationProducts::where('slug',$slug)->with('category')->first();
+                if(!$product){
+                    return response()->json([
+                        'success' => true,
+                        'data' => null,
+                    ],200);
+                }
                 if(!empty($product['image'])){
                     $product['image'] = $appUrl . '/' . $product['image']; 
                     }  

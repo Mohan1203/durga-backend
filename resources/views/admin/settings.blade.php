@@ -90,7 +90,7 @@
             </div>
 
             <!-- Contact Information Section -->
-            <div class="col-md-12 grid-margin stretch-card">
+            {{-- <div class="col-md-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">
@@ -127,7 +127,7 @@
                                     @enderror
                                 </div>
 
-                                {{-- <div class="form-group col-sm-12 col-md-6">
+                                <div class="form-group col-sm-12 col-md-6">
                                     <label>Google Map Link</label>
                                     <input name="map_link" type="text" placeholder="Enter Google Map Embed Link"
                                         class="form-control" value="{{ $settings->map_link ?? '' }}" />
@@ -143,14 +143,14 @@
                                     @error('working_hours')
                                         <span class="text-danger mt-5">{{ $message }}</span>
                                     @enderror
-                                </div> --}}
+                                </div>
                             </div>
 
                             <button type="submit" class="btn btn-primary">Save Contact Info</button>
                         </form>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Social Media Links Section -->
             <div class="col-md-12 grid-margin stretch-card">
