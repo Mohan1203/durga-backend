@@ -42,12 +42,15 @@
                                     <select name="category_id" id="category_id" class="form-control p-3">
                                         <option value="">{{ __('Please') }} {{ __('select') }}</option>
                                         @foreach ($Categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            <option value="{{ $category->id }}" data-name="{{ $category->name }}">
+                                                {{ $category->name }}</option>
                                         @endforeach
                                     </select>
-                                    @error('category_id')
+                                    @error('categories')
                                         <span class="text-danger mt-5">{{ $message }}</span>
                                     @enderror
+                                    <input type="hidden" name="categories" id="categories">
+                                    <div id="categories-container" class="mt-2 d-flex flex-wrap gap-2"></div>
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6">
                                     <label>Slug<span class="text-danger">*</span></label>
@@ -58,17 +61,24 @@
                                     @enderror
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6">
+                                    <label>Description<span class="text-danger">*</span></label>
+                                    <textarea name="description" type="text" class="form-control"></textarea>
+                                </div>
+                                <div class="form-group col-sm-12 col-md-6">
                                     <label>Images</label>
                                     <input type="file" name="image" id="image" class="form-control" />
                                     @error('image')
                                         <span class="text-danger mt-5">{{ $message }}</span>
                                     @enderror
                                 </div>
-
-                                {{-- <div> --}}
                                 <div class="form-group col-sm-12 col-md-6">
-                                    <label>Description<span class="text-danger">*</span></label>
-                                    <textarea name="description" type="text" class="form-control"></textarea>
+                                    <label>Product Description</label>
+                                    <textarea name="product_description" type="text" class="form-control"></textarea>
+                                </div>
+                                <div class="form-group col-sm-12 col-md-6">
+                                    <label>Description Image</label>
+                                    <input type="file" name="product_desc_image" id="product_desc_image"
+                                        class="form-control" />
                                 </div>
                                 <div class="form-group col-sm-12 col-md-6 ">
                                     {{-- <div class="row "> --}}
@@ -105,24 +115,27 @@
                         <h4 class="card-title">
                             List Application Products
                         </h4>
-
                         <table aria-describedby="mydesc" class='table' id='table_list' data-toggle="table"
                             data-url="{{ route('application-products.show', 1) }}" data-click-to-select="true"
                             data-side-pagination="server" data-pagination="true" data-page-list="[5, 10, 20, 50, 100, 200]"
-                            data-search="true" data-show-columns="true" data-show-refresh="true" data-trim-on-search="false"
-                            data-mobile-responsive="true" data-sort-name="id" data-toolbar="#toolbar" data-sort-order="desc"
-                            data-maintain-selected="true" data-export-types='["txt","excel"]'
+                            data-search="true" data-show-columns="true" data-show-refresh="true"
+                            data-trim-on-search="false" data-mobile-responsive="true" data-sort-name="id"
+                            data-toolbar="#toolbar" data-sort-order="desc" data-maintain-selected="true"
+                            data-export-types='["txt","excel"]'
                             data-export-options='{ "fileName": "class-list-<?= date('d-m-y') ?>" ,"ignoreColumn":
                             ["operate"]}' data-show-export="true">
                             <thead>
                                 <tr>
-                                    <th scope="col" data-field="id" data-sortable="true" data-visible="false">ID</th>
+                                    <th scope="col" data-field="id" data-sortable="true">ID</th>
+                                    {{-- <th scope="col" data-field="drag" data-sortable="true" data-visible="false">Drag
+                                    </th> --}}
                                     <th scope="col" data-field="no" data-sortable="false">No</th>
                                     <th scope="col" data-field="name" data-sortable="true">Name</th>
-                                    <th scope="col" data-visible="false" data-field="category_id"
-                                        data-sortable="true">
-                                        Category ID</th>
-                                    <th scope="col" data-field="category_name" data-sortable="true">Category</th>
+                                    <th scope="col" data-field="category_id" data-sortable="true"
+                                        data-visible="false">Category ID</th>
+                                    <th scope="col" data-field="category_name" data-sortable="true">Primary Category
+                                    </th>
+
                                     <th scope="col" data-field="slug" data-sortable="true">Slug</th>
                                     <th scope="col" data-field="created_at" data-sortable="true"
                                         data-visible="false">
@@ -137,5 +150,5 @@
                 </div>
             </div>
         </div>
-    @endsection
-    
+    </div>
+@endsection

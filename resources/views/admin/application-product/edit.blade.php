@@ -91,7 +91,18 @@
                         'placeholder' => 'Description',
                     ],
                     ['name' => 'image', 'type' => 'file', 'label' => 'Product Image', 'placeholder' => ''],
-
+                    [
+                        'name' => 'product_description',
+                        'type' => 'textarea',
+                        'label' => 'Product Description',
+                        'placeholder' => 'Product Description',
+                    ],
+                    [
+                        'name' => 'product_desc_image',
+                        'type' => 'file',
+                        'label' => 'Product Description Image',
+                        'placeholder' => '',
+                    ],
                     ['name' => 'feature', 'type' => 'text', 'label' => 'Feature', 'placeholder' => 'Feature'],
                 ];
             @endphp
@@ -103,14 +114,24 @@
                         <textarea name="{{ $field['name'] }}" class="form-control" id="{{ $field['name'] }}"
                             placeholder="{{ $field['placeholder'] }}" rows="5">{{ old($field['name'], $product->{$field['name']}) }}</textarea>
                     @elseif($field['type'] == 'select')
-                        <select name="category_id" id="category_id" class="form-control p-3">
-                            <option value="">Select Category</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category['id'] }}"
-                                    {{ old('category_id', $product->category_id) == $category['id'] ? 'selected' : '' }}>
-                                    {{ $category['name'] }}</option>
-                            @endforeach
-                        </select>
+                        <div class="form-group">
+                            <select name="category_id" id="category_id" class="form-control p-3">
+                                <option value="">Select Category</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category['id'] }}" data-name="{{ $category['name'] }}">
+                                        {{ $category['name'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('categories')
+                                <span class="text-danger mt-5">{{ $message }}</span>
+                            @enderror
+                            <input type="hidden" name="categories" id="categories"
+                                value="{{ json_encode($selectedCategories) }}">
+                            <input type="hidden" id="categoriesWithNames"
+                                value="{{ json_encode($selectedCategoriesWithNames ?? []) }}">
+                            <div id="categories-container" class="mt-2 d-flex flex-wrap gap-2"></div>
+                        </div>
                     @elseif($field['name'] == 'feature')
                         <div class="row">
                             <div class="col-10">
@@ -137,12 +158,29 @@
 
                             <div class="d-flex flex-column gap-2">
                                 <div class="d-flex flex-column">
-
                                     <input type="file" name="image" class="form-control" id="imageInput">
                                 </div>
                                 <div id="imageContainer" class="position-relative d-inline-block">
                                     @if ($product->image)
                                         <img id="previewImage" src="{{ asset(env('APP_URL') . '/' . $product->image) }}"
+                                            class="h-25 w-25 img-thumbnail">
+                                    @else
+                                        <img id="previewImage" src="" class="h-25 w-25 img-thumbnail d-none">
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @elseif($field['name'] == 'product_desc_image')
+                        <div class="d-flex flex-column gap-2">
+
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex flex-column">
+                                    <input type="file" name="product_desc_image" class="form-control" id="imageInput">
+                                </div>
+                                <div id="imageContainer" class="position-relative d-inline-block">
+                                    @if ($product->product_desc_image)
+                                        <img id="previewImage"
+                                            src="{{ asset(env('APP_URL') . '/' . $product->product_desc_image) }}"
                                             class="h-25 w-25 img-thumbnail">
                                     @else
                                         <img id="previewImage" src="" class="h-25 w-25 img-thumbnail d-none">

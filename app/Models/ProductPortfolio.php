@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 class ProductPortfolio extends Model
 {
 
-    protected $fillable = ['heading','sub_heading','name','description','slug','image','grade_title','grade_description','key_feature_title','key_feature_description','indutry_title'];
+    protected $fillable = ['heading','sub_heading','name','description','slug','image','grade_title','grade_description','key_feature_title','key_feature_description','indutry_title','position'];
     
     public function industry()
     {
@@ -34,4 +34,3 @@ class ProductPortfolio extends Model
     //     return url(Storage::url($value));
     // }   
 }
-

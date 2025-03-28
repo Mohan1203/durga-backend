@@ -11,18 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('setting', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-            $table->string('logo');
-            $table->integer('experience');
-            $table->integer('partner');
-            $table->integer('products');
-            $table->string('stat-image');
-            $table->string('email');
-            $table->json('number');
-            $table->text('address');
-        });
+        // Only create the table if it doesn't exist
+        if (!Schema::hasTable('setting')) {
+            Schema::create('setting', function (Blueprint $table) {
+                $table->id();
+                $table->timestamps();
+                $table->string('logo');
+                $table->integer('experience');
+                $table->integer('partner');
+                $table->integer('products');
+                $table->string('stat-image');
+                $table->string('email');
+                $table->json('number');
+                $table->text('address');
+            });
+        }
     }
 
     /**

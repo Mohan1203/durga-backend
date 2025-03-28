@@ -10,7 +10,7 @@ class application_categories
     public function get_all_categories(Request $request){
         try {
             $appUrl = env('APP_URL', $request->getSchemeAndHttpHost());
-            $allCategories = ApplicationCategory::all()->map(function($category) use ($appUrl){
+            $allCategories = ApplicationCategory::all()->sortBy('sequence')->map(function($category) use ($appUrl){
                 $categoryArray  = $category->toArray();
                 
                 if(!empty($categoryArray['image'])){

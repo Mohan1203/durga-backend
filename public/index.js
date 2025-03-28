@@ -3,6 +3,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (document.querySelector('input[name="name"]') && document.querySelector('input[name="slug"]')) {
         handleSlug();
     }
+    if (document.getElementById("categories")) {
+        handleCategories();
+    }
     if (document.getElementById("loading-spinner")) {
         handleSpinner();
     }
@@ -52,7 +55,7 @@ function handleAddFeature(initialFeatures = []) {
     const addFeatureBtn = document.getElementById("feature-add-btn");
     const featuresContainer = document.getElementById("features-container");
     const featuresArrayInput = document.getElementById("featuresArray");
-    console.log("feature container", featuresContainer)
+
     // Function to update the UI and hidden input
     function updateFeatureList() {
         featuresContainer.innerHTML = "";
@@ -122,6 +125,127 @@ function handleImageUpload() {
         removeImageBtn.style.display = "none";
         imageInput.value = ""; // Clear file input
     });
+}
+function handleCategories() {
+    const categoriesInput = document.getElementById("categories");
+    const categoriesContainer = document.getElementById("categories-container");
+    const categorySelect = document.getElementById("category_id");
+    const categoriesWithNamesInput = document.getElementById("categoriesWithNames");
+
+    if (!categoriesInput || !categoriesContainer || !categorySelect) return;
+
+    // Array to store selected categories
+    let selectedCategories = [];
+
+    // Initialize from existing data - first try categoriesWithNames for edit page
+    if (categoriesWithNamesInput && categoriesWithNamesInput.value) {
+        try {
+            const categoriesWithNames = JSON.parse(categoriesWithNamesInput.value);
+            if (Array.isArray(categoriesWithNames) && categoriesWithNames.length > 0) {
+                selectedCategories = categoriesWithNames;
+                console.log('Initialized categories from categoriesWithNames:', selectedCategories);
+            }
+        } catch (e) {
+            console.error("Error parsing categoriesWithNames:", e);
+        }
+    }
+
+    // If no categories were loaded from categoriesWithNames, try the regular categories input
+    if (selectedCategories.length === 0 && categoriesInput.value) {
+        try {
+            const categoryIds = JSON.parse(categoriesInput.value);
+
+            // If it's just an array of IDs, convert to objects with names
+            if (Array.isArray(categoryIds) && categoryIds.length > 0) {
+                if (typeof categoryIds[0] !== 'object') {
+                    // It's just an array of IDs, get names from select options
+                    selectedCategories = categoryIds.map(id => {
+                        const option = Array.from(categorySelect.options).find(opt => opt.value == id);
+                        return {
+                            id: id,
+                            name: option ? option.textContent.trim() : 'Unknown'
+                        };
+                    });
+                } else {
+                    // It's already an array of objects
+                    selectedCategories = categoryIds;
+                }
+                console.log('Initialized categories from categoriesInput:', selectedCategories);
+            }
+        } catch (e) {
+            console.error("Error parsing categories:", e);
+        }
+    }
+
+    // Update UI if we have categories
+    if (selectedCategories.length > 0) {
+        renderCategories();
+    }
+
+    categorySelect.addEventListener('change', function () {
+        const categoryId = this.value;
+        if (!categoryId) return;
+
+        const categoryName = this.options[this.selectedIndex].getAttribute('data-name') ||
+            this.options[this.selectedIndex].textContent.trim();
+
+        // Check if category is already selected
+        if (selectedCategories.some(cat => cat.id == categoryId)) {
+            alert('This category is already selected');
+            this.selectedIndex = 0;
+            return;
+        }
+
+        // Add to selected categories array
+        selectedCategories.push({
+            id: categoryId,
+            name: categoryName
+        });
+
+        // Update hidden input
+        updateCategoriesInput();
+
+        // Render category items
+        renderCategories();
+
+        // Reset select to default option
+        this.selectedIndex = 0;
+    });
+
+    function renderCategories() {
+        categoriesContainer.innerHTML = '';
+
+        selectedCategories.forEach((category, index) => {
+            const categoryItem = document.createElement('div');
+            categoryItem.className = 'badge bg-primary me-2 mb-2 p-2';
+            categoryItem.style.fontSize = '0.9rem';
+
+            const displayName = category.name || 'Unknown';
+
+            categoryItem.innerHTML = `
+                ${displayName} <span class="ms-1" style="cursor:pointer;" data-index="${index}">&times;</span>
+            `;
+
+            categoriesContainer.appendChild(categoryItem);
+
+            // Add event listener to this specific remove button
+            const removeButton = categoryItem.querySelector('span');
+            removeButton.addEventListener('click', function () {
+                const index = parseInt(this.getAttribute('data-index'));
+                selectedCategories.splice(index, 1);
+                updateCategoriesInput();
+                renderCategories();
+            });
+        });
+    }
+
+    function updateCategoriesInput() {
+        // Store only the IDs in the hidden input
+        const categoryIds = selectedCategories.map(cat => cat.id);
+        console.log("categoryIds", categoryIds);
+        categoriesInput.value = JSON.stringify(categoryIds);
+        console.log("categoriesInput", categoriesInput.value);
+    }
 }
 
 

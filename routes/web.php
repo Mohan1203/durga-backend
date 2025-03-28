@@ -27,7 +27,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get("/edit_category/{id}",[Application_categories_controller::class,"show_edit_application_categories"]);
     Route::post("/edit_category/{id}",[Application_categories_controller::class,"edit_application_category"])->name('handle.edit-categories');
     Route::post("/delele_category/{id}",[Application_categories_controller::class,"delete_application_category"])->name('handle.delete-categories');
-    
+    Route::post("/update-sequence",[Application_categories_controller::class,"update_sequence"])->name('handle.update-category-sequence');
 
 
     Route::resource('application-products', ApplicationProductController::class);
@@ -39,7 +39,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete("/delete-feature-section/{id}",[ProductPortfolioController::class,"deleteFeatureSection"])->name('feature-section.delete');
     Route::delete("/delete-key-feature/{id}",[ProductPortfolioController::class,"deleteKeyFeature"])->name('key-feature.delete');
     Route::resource('product-portfolio', ProductPortfolioController::class);
-   
+    Route::post('product-portfolio/update-order', [ProductPortfolioController::class, 'updateOrder'])->name('product-portfolio.updateOrder');
+    Route::post('product-portfolio/drag-start', [ProductPortfolioController::class, 'dragStart'])->name('product-portfolio.dragStart');
+    Route::post('product-portfolio/drag-over', [ProductPortfolioController::class, 'dragOver'])->name('product-portfolio.dragOver');
+    Route::post('product-portfolio/drag-end', [ProductPortfolioController::class, 'dragEnd'])->name('product-portfolio.dragEnd');
 
     Route::get("/product-portfolios-categories",[Product_portfolios_categories_contoller::class,"show_product_portfolios_categories"]);
 

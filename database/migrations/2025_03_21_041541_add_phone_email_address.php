@@ -12,10 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->string('phone')->nullable();
-            $table->string('email')->nullable();
-            $table->string('address')->nullable();
-
+            // Check if the columns don't exist before adding them
+            if (!Schema::hasColumn('settings', 'phone')) {
+                $table->string('phone')->nullable();
+            }
+            
+            if (!Schema::hasColumn('settings', 'email')) {
+                $table->string('email')->nullable();
+            }
+            
+            if (!Schema::hasColumn('settings', 'address')) {
+                $table->string('address')->nullable();
+            }
         });
     }
 
@@ -25,9 +33,18 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->dropColumn('phone');
-            $table->dropColumn('email');
-            $table->dropColumn('address');
+            // Only drop columns if they exist
+            if (Schema::hasColumn('settings', 'phone')) {
+                $table->dropColumn('phone');
+            }
+            
+            if (Schema::hasColumn('settings', 'email')) {
+                $table->dropColumn('email');
+            }
+            
+            if (Schema::hasColumn('settings', 'address')) {
+                $table->dropColumn('address');
+            }
         });
     }
 };

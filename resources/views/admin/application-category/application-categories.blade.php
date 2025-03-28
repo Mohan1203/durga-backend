@@ -1,7 +1,4 @@
-<!-- resources/views/admin/dashboard.blade.php -->
 @extends('layouts.admin')
-
-{{-- @section('title', 'Dashboard') --}}
 
 @section('content')
     <div class="">
@@ -37,11 +34,11 @@
                         @enderror
                     </div>
                 @endforeach
-
             </div>
 
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
+
         <div class="mt-4">
             <h1>Application Categories</h1>
 
@@ -55,6 +52,7 @@
             <table id="categories-table" class="table table-bordered d-none">
                 <thead>
                     <tr>
+                        <th>Drag</th>
                         <th>#</th>
                         <th>Category Name</th>
                         <th>Slug</th>
@@ -62,9 +60,11 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="sortable-categories">
+
                     @foreach ($all_categories as $key => $category)
-                        <tr>
+                        <tr data-id="{{ $category['id'] }}">
+                            <td class="drag-handle" data-id="{{ $category['id'] }}">{{ $category['id'] }}</td>
                             <td>{{ $key + 1 }}</td>
                             <td>{{ $category['name'] }}</td>
                             <td>{{ $category['slug'] }}</td>
@@ -75,7 +75,6 @@
                             <td>
                                 <a href="/edit_category/{{ $category['id'] }}" class="btn btn-warning btn-sm">Edit</a>
 
-                                {{-- <a href="/delele_category/{{ $category['id'] }}" class="btn btn-danger btn-sm">Delete</a> --}}
                                 <form action="{{ route('handle.delete-categories', $category['id']) }}" method="POST"
                                     style="display: inline;">
                                     @csrf
@@ -89,4 +88,37 @@
             </table>
         </div>
     </div>
+
+    <!-- jQuery & jQuery UI -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $("#sortable-categories").sortable({
+                update: function(event, ui) {
+                    let orderedIds = [];
+                    $(".drag-handle").each(function() {
+                        orderedIds.push($(this).data("id"));
+                    });
+
+                    const orderedId = JSON.stringify(orderedIds);
+                    $.ajax({
+                        url: "{{ route('handle.update-category-sequence') }}",
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            orderedIds: orderedIds
+                        },
+                        success: function(response) {
+                            console.log("Order updated successfully");
+                        },
+                        error: function(xhr) {
+                            console.log("Error updating order:", xhr.responseText);
+                        }
+                    });
+                }
+            }).disableSelection();
+        });
+    </script>
 @endsection

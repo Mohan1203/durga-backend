@@ -30,33 +30,55 @@ class ApplicationProductController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+       
         $request->validate([
             'name'=>'required',
             'slug'=>'required | unique:application_products,slug',
             'image'=>'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'category_id'=>'required',    
+            'categories'=>'required',    
         ],[
-            'slug.unique' => 'Slug must be unique'
+            'slug.unique' => 'Slug must be unique',
+            'categories.required' => 'At least one category must be selected',
         ]);
             try{
+                // Directly decode the JSON string from the form
+                $categoryIds = json_decode($request->categories, true);
+                
+                // Ensure we have categories
+                if (empty($categoryIds)) {
+                    return back()->with('error', 'At least one category must be selected');
+                }
+                
+                $image = $request->file('image'); 
+                $imageNameWithoutExtension = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                $imageName = time() . '_' . $imageNameWithoutExtension . '.' . $image->getClientOriginalExtension();
+
+                $productDescImage = $request->file('product_desc_image');
+                $productDescImageNameWithoutExtension = pathinfo($productDescImage->getClientOriginalName(), PATHINFO_FILENAME);
+                $productDescImageName = time() . '_' . $productDescImageNameWithoutExtension . '.' . $productDescImage->getClientOriginalExtension();
+
                 $features = json_decode($request->features);
-                $imageName = time().'.'.$request->image->extension();
-                $request->image->move(public_path("product"),$imageName);
+                $request->image->move(public_path("product"),$imageName);        
+                $request->product_desc_image->move(public_path("product"),$productDescImageName);
                 $product = new ApplicationProducts;
                 $product->name = $request->name;
                 $product->image = 'product/'.$imageName;
                 $product->slug = $request->slug;
                 $product->description = $request->description;
-                $product->category_id = $request->category_id;
+                $product->category_id = $categoryIds[0] ?? null; 
+                $product->product_description = $request->product_description;
+                $product->product_desc_image = 'product/'.$productDescImageName;
+
                 $product->features = $features;
                 $product->save();
+                
+                // Attach all selected categories to the product
+                $product->categories()->attach($categoryIds);
+                
                 return back()->with('success', 'Product added successfully');    
-            }catch(QueryException $e){
-                if($e->getcode() == 23000){
-                    return back()->with('error','Slug must be unique');
-                    return back()->with('error',"Something went wrong");
-                }
+            }catch(\Exception $e){
+                // More detailed error handling
+                return back()->with('error', 'Error: ' . $e->getMessage());
             }
            
     }
@@ -71,7 +93,7 @@ class ApplicationProductController extends Controller
         $sort = request('sort', 'id');
         $order = request('order', 'DESC');
 
-        $sql = ApplicationProducts::with('category')->where('id', '!=', 0);
+        $sql = ApplicationProducts::with(['category', 'categories'])->where('id', '!=', 0);
 
         if (!empty($_GET['search'])) {
             $search = $_GET['search'];
@@ -124,9 +146,39 @@ class ApplicationProductController extends Controller
      */
     public function edit(string $id)
     {
-        $product = ApplicationProducts::findOrFail($id);
-        $categories = ApplicationCategory::select('name','slug','id')->get();
-        return view('admin.application-product.edit',compact('categories','product'));
+        // Get the product with its categories
+        $product = ApplicationProducts::with('categories')->findOrFail($id);
+        
+        // Get all available categories
+        $categories = ApplicationCategory::select('id', 'name', 'slug')->get();
+        
+        // Get the IDs of already selected categories
+        $selectedCategories = $product->categories->pluck('id')->toArray();
+        
+        // Also add the primary category if it exists and isn't already in the array
+        if ($product->category_id && !in_array($product->category_id, $selectedCategories)) {
+            $selectedCategories[] = $product->category_id;
+        }
+        
+        // Get the full category data for display
+        $selectedCategoriesWithNames = [];
+        
+        foreach ($selectedCategories as $categoryId) {
+            $category = $categories->firstWhere('id', $categoryId);
+            if ($category) {
+                $selectedCategoriesWithNames[] = [
+                    'id' => $categoryId,
+                    'name' => $category->name
+                ];
+            }
+        }
+        
+        return view('admin.application-product.edit', compact(
+            'categories', 
+            'product', 
+            'selectedCategories',
+            'selectedCategoriesWithNames'
+        ));
     }
 
     /**
@@ -135,24 +187,61 @@ class ApplicationProductController extends Controller
     public function update(Request $request, string $id)
     {
         $product = ApplicationProducts::findOrFail($id);
-        // dd($request->name);
+        
         $request->validate([
             'name'=>'required',
             'slug'=>'required',
-            'category_id'=>'required',     
+            'categories'=>'required',
+        ],[
+            'categories.required' => 'At least one category must be selected',
         ]);
-        $product->name = $request->name;
-        $product->slug = $request->slug;
-        $product->category_id = $request->category_id;
-        $product->description = $request->description ?? $product->description;
-        $product->features = json_decode($request->features) ?? $product->features; 
-        if($request->image != null){
-            $imageName = time().'.'.$request->image->extension();
-            $request->image->move(public_path("product"),$imageName);
-            $product->image = 'product/' . $imageName;
+        
+        try {
+            // Decode categories JSON
+            $categoryIds = json_decode($request->categories, true);
+            
+            // Ensure we have categories
+            if (empty($categoryIds)) {
+                return back()->with('error', 'At least one category must be selected');
+            }
+            
+            $product->name = $request->name;
+            $product->slug = $request->slug;
+            $product->category_id = $categoryIds[0] ?? $product->category_id; // Set primary category
+            $product->description = $request->description ?? $product->description;
+            $product->features = json_decode($request->features) ?? $product->features; 
+            $product->product_description = $request->product_description ?? $product->product_description;
+            if($request->image != null){
+                $image = $request->file('image'); 
+                $imageNameWithoutExtension = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+                $imageName = time() . '_' . $imageNameWithoutExtension . '.' . $image->getClientOriginalExtension();
+                $request->image->move(public_path("product"),$imageName);
+                $product->image = 'product/' . $imageName;
+            }
+
+          
+                
+
+
+            if($request->product_desc_image != null){
+                $productDescImage = $request->file('product_desc_image');
+                $productDescImageNameWithoutExtension = pathinfo($productDescImage->getClientOriginalName(), PATHINFO_FILENAME);
+                $productDescImageName = time() . '_' . $productDescImageNameWithoutExtension . '.' . $productDescImage->getClientOriginalExtension();
+                $request->product_desc_image->move(public_path("product"),$productDescImageName);
+                $product->product_desc_image = 'product/' . $productDescImageName;
+            }
+            
+            $product->save();
+            
+            // Sync categories
+            $product->categories()->sync($categoryIds);
+            
+            return back()->with("success","Product updated successfully");
+            
+        } catch(\Exception $e){
+            // More detailed error handling
+            return back()->with('error', 'Error: ' . $e->getMessage());
         }
-        $product->save();
-        return back()->with("success","Product edit successfully");
     }
 
     /**
