@@ -31,11 +31,11 @@ class SettingContoller extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'years_experience' => 'nullable|integer',
             'global_partners' => 'nullable|integer',
             'products_count' => 'nullable|integer',
-            'state_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'state_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $settings = Settings::first() ?? new Settings();

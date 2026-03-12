@@ -50,7 +50,7 @@ class ProductPortfolioController extends Controller
                 'name' => 'required|string|max:255',
                 'description' => 'required|string',
                 'slug' => 'required|string|unique:product_portfolios,slug|max:255',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
                 'grade_title' => 'required|string|max:255',
                 'feature_title' => 'required|string|max:255',
                 'feature_description' => 'required|string',
@@ -64,10 +64,10 @@ class ProductPortfolioController extends Controller
                 'key_feature' => 'required|array',
                 'key_feature.*.name' => 'required|string|max:255',
                 'key_feature.*.description' => 'required|string',
-                'key_feature.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'key_feature.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
                 'industry' => 'required|array',
                 'industry.*.name' => 'required|string|max:255',
-                'industry.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'industry.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             ]);
 
             DB::beginTransaction(); // Start transaction
@@ -164,7 +164,7 @@ class ProductPortfolioController extends Controller
                 }
             }
           
-            DB::commit(); // Commit transaction
+            DB::commit(); 
 
             return back()->with('success', 'Product added successfully');
         } catch (\Throwable $e) {
@@ -181,8 +181,8 @@ class ProductPortfolioController extends Controller
     {
         $offset = request('offset', 0);
         $limit = request('limit', 10);
-        $sort = request('sort', 'id');
-        $order = request('order', 'DESC');
+        $sort = request('sort', 'sequence');
+        $order = request('order', 'ASC');
         $sql = ProductPortfolio::with('grade','keyFeature','industry','featureSection')->where('id', '!=', 0);
 
         if (!empty($_GET['search'])) {
@@ -197,7 +197,9 @@ class ProductPortfolioController extends Controller
         }
         $total = $sql->count();
 
-        $sql->orderBy($sort, $order)->skip($offset)->take($limit);
+        $sql->orderBy('sequence', 'ASC');
+
+        $sql->skip($offset)->take($limit);
         $res = $sql->get();
          
         $bulkData = array();
@@ -440,141 +442,25 @@ class ProductPortfolioController extends Controller
     /**
      * Update the order of products
      */
-    public function updateOrder(Request $request)
-    {
+    public function update_sequence(Request $request){
         try {
-            // Log the incoming request for debugging
-            \Log::info('Received updateOrder request', [
-                'content_type' => $request->header('Content-Type'),
-                'data' => $request->all(),
-                'json' => $request->json()->all()
-            ]);
-            
-            // Check if the request is JSON
-            if ($request->isJson()) {
-                $orderedIds = $request->json('order');
-            } else {
-                $orderedIds = $request->input('order');
-            }
-            
-            // Validate the data
-            if (!is_array($orderedIds) || empty($orderedIds)) {
-                \Log::error('Invalid order data format', ['order' => $orderedIds]);
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid data: order array is required'
-                ], 400);
-            }
-            
-            \Log::info('Processing product sequence update', ['ids' => $orderedIds]);
-            
-            DB::beginTransaction();
-            
-            // Update positions based on array order
-            foreach ($orderedIds as $index => $productId) {
-                $result = ProductPortfolio::where('id', $productId)
-                    ->update(['position' => $index + 1]);
-                    
-                \Log::info('Updated product position', [
-                    'id' => $productId, 
-                    'position' => $index + 1,
-                    'success' => $result ? 'yes' : 'no'
-                ]);
-            }
-            
-            DB::commit();
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Product sequence updated successfully',
-                'updated_ids' => $orderedIds
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Failed to update product sequence', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update product sequence: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Handle drag over event
-     */
-    public function dragOver(Request $request)
-    {
-        $request->validate([
-            'id' => 'required|integer',
-            'position' => 'required|integer',
-        ]);
-
-        try {
-            // Log the drag over event
-            \Log::info('Drag over', [
-                'id' => $request->id,
-                'position' => $request->position
-            ]);
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Drag over registered',
-                'item_id' => $request->id,
-                'current_position' => $request->position
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to register drag over: ' . $e->getMessage()
-            ], 500);
-        }
-    }
+            $sequences = $request->input('orderedIds'); 
     
-    /**
-     * Handle drag end event with full sequence data
-     */
-    public function dragEnd(Request $request)
-    {
-        $request->validate([
-            'id' => 'required|integer',
-            'start_position' => 'required|integer',
-            'end_position' => 'required|integer',
-            'sequence' => 'required|array',
-            'sequence.*.id' => 'required|integer',
-            'sequence.*.position' => 'required|integer',
-        ]);
-
-        try {
-            // Log drag end event with complete sequence
-            \Log::info('Drag end', [
-                'moved_item_id' => $request->id,
-                'from_position' => $request->start_position,
-                'to_position' => $request->end_position,
-                'sequence' => $request->sequence
-            ]);
-            
-            // You can process the sequence data here
-            // For example, update all positions in the database
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Drag end processed successfully',
-                'item_moved' => [
-                    'id' => $request->id,
-                    'from' => $request->start_position,
-                    'to' => $request->end_position
-                ],
-                'sequence_received' => $request->sequence
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to process drag end: ' . $e->getMessage()
-            ], 500);
+            if (!is_array($sequences)) {
+                return response()->json(['success' => false, 'message' => 'Invalid data format'], 400);
+            }
+    
+            // Update each category's sequence
+            foreach ($sequences as $index => $id) {
+                ProductPortfolio::where('id', $id)
+                    ->update(['sequence' => $index + 1]); 
+            }
+    
+            return response()->json(['success' => true, 'message' => 'product portfolio sequence updated successfully']);
+        } catch(\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
+
+   
 }

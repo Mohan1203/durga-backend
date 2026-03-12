@@ -19,7 +19,7 @@ class Application_categories_controller
         $request->validate([
             'name' => 'required',
             'slug' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
         try{
             $imageName = time().'.'.$request->image->extension();

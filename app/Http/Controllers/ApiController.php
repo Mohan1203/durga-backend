@@ -10,10 +10,10 @@ class ApiController extends Controller
     public function getProductPortfolio()
     {
         try {
-            $products = ProductPortfolio::all()->map(function ($product) {
-                $product->image = url('storage/' . $product->image); // Adjust the path as needed
+            $products = ProductPortfolio::all()->sortBy('sequence')->map(function ($product) {
+                $product->image = url('storage/' . $product->image); 
                 return $product;
-            });
+            })->values()->all();
            
             return response()->json([
                 'success' => true,

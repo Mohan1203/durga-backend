@@ -21,7 +21,7 @@
             <form class="login-form" action="{{ route('handle.login') }}" method="POST">
                 @csrf
                 <div class="input-group">
-                    <label for="email">email</label>
+                    <label for="email">Email</label>
                     <input type="email" id="email" name="email" placeholder="Enter your email" required>
                 </div>
                 

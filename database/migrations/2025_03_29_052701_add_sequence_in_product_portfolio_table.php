@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('product_portfolios', function (Blueprint $table) {
-            $table->integer('sequence')->default(0)->after('id');    
+            $table->integer('sequence')->default(0)->after('id');
         });
 
         $portfolios = DB::table('product_portfolios')->get();

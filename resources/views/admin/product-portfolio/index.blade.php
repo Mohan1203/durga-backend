@@ -234,7 +234,7 @@
                             List Products
                         </h4>
 
-                        <table aria-describedby="mydesc" class='table' id='table_list' data-toggle="table"
+                        <table aria-describedby="mydesc" class='table reorder-row' id='table_list' data-toggle="table"
                             data-url="{{ route('product-portfolio.show', 1) }}" data-click-to-select="true"
                             data-side-pagination="server" data-pagination="true"
                             data-page-list="[5, 10, 20, 50, 100, 200]" data-search="true" data-show-columns="true"
@@ -244,6 +244,8 @@
                             data-export-options='{ "fileName": "class-list-<?= date('d-m-y') ?>" ,"ignoreColumn":
                             ["operate"]}' data-show-export="true" class="sortable-table"
                             data-reorderable-rows="true" data-unique-id="id"
+                            data-use-row-attr-func="true"
+                            data-on-drag-class="bs-dragged-row"
                             >
                             <thead>
                                 <tr>
@@ -270,13 +272,20 @@
             </div>
         </div>
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.1/dist/bootstrap-table.min.css">
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.1/dist/extensions/reorder-rows/bootstrap-table-reorder-rows.css">
+
+        <script src="https://cdn.jsdelivr.net/npm/tablednd@1.0.5/dist/jquery.tablednd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.1/dist/bootstrap-table.min.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.1/dist/extensions/reorder-rows/bootstrap-table-reorder-rows.min.js">
+        </script>
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 let nameInput = document.querySelector("input[name='name']");
                 let slugInput = document.querySelector("input[name='slug']");
-
                 nameInput.addEventListener("keyup", function() {
                     let slug = nameInput.value
                         .toLowerCase()
@@ -286,5 +295,28 @@
                     slugInput.value = slug;
                 });
             });
+            $(function() {
+                $('#table_list').bootstrapTable()
+                $('#table_list').on('reorder-row.bs.table', function(e, data) {
+                    $.ajax({
+                        url: "{{ route('handle.update-product-sequence') }}",
+                        method: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            orderedIds: data.map(row => row.id)
+                        },
+                        success: function(response) {
+                            console.log("Order updated successfully");
+                        },
+                        error: function(xhr) {
+                            console.log("Error updating order:", xhr.responseText);
+                        }
+                    });
+                });
+
+                $('#button').click(function() {
+                    alert("hello")
+                });
+            })
         </script>
     @endsection

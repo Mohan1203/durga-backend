@@ -30,17 +30,17 @@ class ApplicationProductController extends Controller
      */
     public function store(Request $request)
     {
-       
         $request->validate([
             'name'=>'required',
             'slug'=>'required | unique:application_products,slug',
-            'image'=>'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image'=>'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'categories'=>'required',    
         ],[
             'slug.unique' => 'Slug must be unique',
             'categories.required' => 'At least one category must be selected',
         ]);
             try{
+                $productDescImageName = null;
                 // Directly decode the JSON string from the form
                 $categoryIds = json_decode($request->categories, true);
                 
@@ -53,13 +53,17 @@ class ApplicationProductController extends Controller
                 $imageNameWithoutExtension = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
                 $imageName = time() . '_' . $imageNameWithoutExtension . '.' . $image->getClientOriginalExtension();
 
+                if($request->product_desc_image){
                 $productDescImage = $request->file('product_desc_image');
                 $productDescImageNameWithoutExtension = pathinfo($productDescImage->getClientOriginalName(), PATHINFO_FILENAME);
                 $productDescImageName = time() . '_' . $productDescImageNameWithoutExtension . '.' . $productDescImage->getClientOriginalExtension();
+                }
 
                 $features = json_decode($request->features);
                 $request->image->move(public_path("product"),$imageName);        
+                if($request->product_desc_image){
                 $request->product_desc_image->move(public_path("product"),$productDescImageName);
+                }
                 $product = new ApplicationProducts;
                 $product->name = $request->name;
                 $product->image = 'product/'.$imageName;
@@ -67,7 +71,7 @@ class ApplicationProductController extends Controller
                 $product->description = $request->description;
                 $product->category_id = $categoryIds[0] ?? null; 
                 $product->product_description = $request->product_description;
-                $product->product_desc_image = 'product/'.$productDescImageName;
+                $product->product_desc_image = $productDescImageName ? 'product/'.$productDescImageName : null;
 
                 $product->features = $features;
                 $product->save();
@@ -107,7 +111,7 @@ class ApplicationProductController extends Controller
         }
         $total = $sql->count();
 
-        $sql->orderBy($sort, $order)->skip($offset)->take($limit);
+        $sql->orderBy('sequence', 'ASC')->skip($offset)->take($limit);
         $res = $sql->get();
 
         $bulkData = array();
@@ -267,6 +271,24 @@ class ApplicationProductController extends Controller
                 'success' => false,
                 'message' => 'Error deleting product: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function update_sequence(Request $request){
+        try {
+            $sequences = $request->input('orderedIds'); 
+            if (!is_array($sequences)) {
+                return response()->json(['success' => false, 'message' => 'Invalid data format'], 400);
+            }
+    
+            // Update each category's sequence
+            foreach ($sequences as $index => $id) {
+                ApplicationProducts::where('id', $id)
+                    ->update(['sequence' => $index + 1]); 
+            }
+            return response()->json(['success' => true, 'message' => 'application product sequence updated successfully']);
+        } catch(\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 }

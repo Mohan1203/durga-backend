@@ -20,7 +20,6 @@ class user_contact extends Controller
         ]);
 
         try {
-            // Send email
             Mail::raw($request->message, function($message) use ($request) {
                 $message->from($request->email, $request->firstname . ' ' . $request->lastname)
                         ->to(config('mail.from.address'))

@@ -115,7 +115,7 @@
                         <h4 class="card-title">
                             List Application Products
                         </h4>
-                        <table aria-describedby="mydesc" class='table' id='table_list' data-toggle="table"
+                        <table aria-describedby="mydesc" class='table reorder-row' id='table_list' data-toggle="table"
                             data-url="{{ route('application-products.show', 1) }}" data-click-to-select="true"
                             data-side-pagination="server" data-pagination="true" data-page-list="[5, 10, 20, 50, 100, 200]"
                             data-search="true" data-show-columns="true" data-show-refresh="true"
@@ -123,7 +123,11 @@
                             data-toolbar="#toolbar" data-sort-order="desc" data-maintain-selected="true"
                             data-export-types='["txt","excel"]'
                             data-export-options='{ "fileName": "class-list-<?= date('d-m-y') ?>" ,"ignoreColumn":
-                            ["operate"]}' data-show-export="true">
+                            ["operate"]}' data-show-export="true"
+                            data-reorderable-rows="true" data-unique-id="id"
+                            data-use-row-attr-func="true"
+                            data-on-drag-class="bs-dragged-row"
+                            >
                             <thead>
                                 <tr>
                                     <th scope="col" data-field="id" data-sortable="true">ID</th>
@@ -151,4 +155,40 @@
             </div>
         </div>
     </div>
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.1/dist/bootstrap-table.min.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.1/dist/extensions/reorder-rows/bootstrap-table-reorder-rows.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/tablednd@1.0.5/dist/jquery.tablednd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.1/dist/bootstrap-table.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap-table@1.24.1/dist/extensions/reorder-rows/bootstrap-table-reorder-rows.min.js">
+    </script>
+    <script>
+        $(function() {
+            $('#table_list').bootstrapTable()
+            $('#table_list').on('reorder-row.bs.table', function(e, data) {
+                $.ajax({
+                    url: "{{ route('handle.update-application-product-sequence') }}",
+                    method: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        orderedIds: data.map(row => row.id)
+                    },
+                    success: function(response) {
+                        console.log("Order updated successfully");
+                    },
+                    error: function(xhr) {
+                        console.log("Error updating order:", xhr.responseText);
+                    }
+                });
+            });
+
+            $('#button').click(function() {
+                alert("hello")
+            });
+        })
+    </script>
 @endsection
